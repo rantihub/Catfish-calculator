@@ -140,21 +140,12 @@
         }
 
         .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
             margin-top: 24px;
             margin-bottom: 24px;
         }
 
-        @media (min-width: 480px) {
-            .btn-group {
-                flex-direction: row;
-            }
-        }
-
         button {
-            flex: 1;
+            width: 100%;
             padding: 12px;
             border: none;
             border-radius: 6px;
@@ -176,10 +167,11 @@
         .btn-whatsapp {
             background-color: var(--accent);
             color: white;
-            display: flex;
+            display: none; /* Hidden by default until summary is generated */
             align-items: center;
             justify-content: center;
             gap: 8px;
+            margin-top: 20px;
         }
 
         .summary-card {
@@ -372,7 +364,6 @@
 
     <div class="btn-group">
         <button class="btn-calc" id="btnGenerate">Generate Production Summary</button>
-        <button class="btn-whatsapp" id="btnWhatsApp">Share Summary via WhatsApp</button>
     </div>
 
     <div class="summary-card" id="summaryCard">
@@ -413,6 +404,9 @@
             * Specific bag sizes applied: Perla Larva (1kg), 0.5mm - 1.8mm (5kg), 2mm and above (25kg). Total Feed Value accounts for unit bag prices calculated against required bag counts.
         </div>
     </div>
+
+    <!-- WhatsApp Share Button moved to bottom -->
+    <button class="btn-whatsapp" id="btnWhatsApp">Share Summary via WhatsApp</button>
 </div>
 
 <script>
@@ -625,6 +619,11 @@
 
         const summaryCard = document.getElementById('summaryCard');
         summaryCard.style.display = 'block';
+        
+        // Show the WhatsApp button at the bottom
+        const btnWhatsApp = document.getElementById('btnWhatsApp');
+        btnWhatsApp.style.display = 'flex';
+
         summaryCard.scrollIntoView({ behavior: 'smooth' });
     }
 
