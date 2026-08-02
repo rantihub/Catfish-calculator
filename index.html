@@ -381,6 +381,10 @@
                 <div class="metric-value" id="resTotalFeed">-</div>
             </div>
             <div class="metric">
+                <div class="metric-title">Total Bags Required</div>
+                <div class="metric-value" id="resTotalBags">-</div>
+            </div>
+            <div class="metric">
                 <div class="metric-title">Target Weight</div>
                 <div class="metric-value" id="resTargetWeight">-</div>
             </div>
@@ -549,6 +553,7 @@
         const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', dateOptions);
 
         let totalCost = 0;
+        let totalBagsCount = 0;
         const stageResults = [];
         const costResults = [];
 
@@ -559,6 +564,7 @@
             const cost = fullBagsCount * data.price;
 
             totalCost += cost;
+            totalBagsCount += fullBagsCount;
 
             stageResults.push({
                 feedKey,
@@ -582,6 +588,7 @@
             totalEstDays,
             formattedHarvestDate,
             totalFeedKg: totalFeedKg.toFixed(1),
+            totalBagsCount,
             totalCost,
             stageResults,
             costResults,
@@ -593,6 +600,7 @@
         // Render UI metrics
         document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
         document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
+        document.getElementById('resTotalBags').innerText = `${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}`;
         document.getElementById('resTargetWeight').innerText = targetHarvestG >= 1000 ? `${(targetHarvestG / 1000).toFixed(1)} KG` : `${targetHarvestG} Grams`;
         document.getElementById('resDuration').innerText = `~${totalEstDays} Days (${(totalEstDays / 30).toFixed(1)} mos)`;
 
@@ -603,6 +611,11 @@
             li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''})</strong>`;
             stageListEl.appendChild(li);
         });
+
+        const totalBagsLi = document.createElement('li');
+        totalBagsLi.className = 'total-row';
+        totalBagsLi.innerHTML = `<span>Total Bags Required:</span> <strong>${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}</strong>`;
+        stageListEl.appendChild(totalBagsLi);
 
         const costListEl = document.getElementById('costList');
         costListEl.innerHTML = '';
@@ -646,6 +659,7 @@
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
+        const totalBagsLabel = currentSummary.totalBagsCount > 1 ? 'bags' : 'bag';
 
         const text = `*Skretting Catfish Production Plan*
 ---------------------------
@@ -656,6 +670,7 @@
 - Est. Cycle Duration: ~${currentSummary.totalEstDays} Days
 - Target Harvest Date: ${currentSummary.formattedHarvestDate}
 - Total Feed Required: ${currentSummary.totalFeedKg} KG
+- Total Bags Required: ${currentSummary.totalBagsCount} ${totalBagsLabel}
 ---------------------------
 FEED REQUIREMENT BREAKDOWN:
 ${stageText}---------------------------
