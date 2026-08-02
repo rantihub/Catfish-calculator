@@ -1,0 +1,579 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skretting Fish Production & Feed Planner</title>
+    <style>
+        :root {
+            --primary: #006699;
+            --primary-dark: #004080;
+            --bg: #edf2f7;
+            --card-bg: #ffffff;
+            --text: #2d3748;
+            --accent: #25D366;
+            --border: #cbd5e0;
+            --subtle: #ebf8ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 12px;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        header p {
+            font-size: 0.88rem;
+            color: #4a5568;
+            margin-top: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 550px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 0.88rem;
+            color: #2d3748;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 480px) {
+            .btn-group {
+                flex-direction: row;
+            }
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .btn-calc {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-whatsapp {
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .summary-card {
+            display: none; 
+            background: #f7fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .summary-card h2 {
+            font-size: 1.15rem;
+            color: var(--primary-dark);
+            margin-bottom: 14px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 6px;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .metric {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .metric-title {
+            font-size: 0.75rem;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-top: 2px;
+        }
+
+        .breakdown-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            margin-top: 16px;
+            color: var(--primary-dark);
+        }
+
+        .breakdown-list {
+            list-style: none;
+        }
+
+        .breakdown-list li {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            padding: 7px 0;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .breakdown-list li:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-list li.total-row {
+            border-top: 2px solid var(--primary);
+            padding-top: 10px;
+            margin-top: 4px;
+            font-size: 1rem;
+            color: var(--primary-dark);
+        }
+
+        .density-warning {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.82rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .density-ok { background: #e6fffa; color: #234e52; border: 1px solid #b2f5ea; }
+        .density-high { background: #fffaf0; color: #7b341e; border: 1px solid #feebc8; }
+
+        .note {
+            font-size: 0.75rem;
+            color: #718096;
+            margin-top: 14px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Skretting Fish Production & Feed Planner</h1>
+        <p>Aquaculture Production, Feed Budgeting & Harvest Cycle Estimator</p>
+    </header>
+
+    <div class="form-grid">
+        <div class="form-group">
+            <label for="pondType">Pond Infrastructure Type</label>
+            <select id="pondType">
+                <option value="concrete">Concrete Tank</option>
+                <option value="tarpaulin">Tarpaulin Tank</option>
+                <option value="earthen">Earthen Pond</option>
+                <option value="ras">RAS (Recirculating System)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="pondDimension">Pond Capacity / Size</label>
+            <input type="number" id="pondDimension" value="50" min="1" step="0.5" placeholder="e.g. 50">
+            <span id="unitLabel" style="font-size: 0.75rem; color: #718096; margin-top: 3px;">Volume in Cubic Meters (m³)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="numFish">Target Stocking Quantity (Fish)</label>
+            <input type="number" id="numFish" value="2500" min="1" step="10">
+        </div>
+
+        <div class="form-group">
+            <label for="stockingSize">Initial Stocking Weight (grams)</label>
+            <select id="stockingSize">
+                <option value="5">Fingerling (5g)</option>
+                <option value="10" selected>Juvenile (10g)</option>
+                <option value="15">Post-Juvenile (15g)</option>
+                <option value="30">Shooter (30g)</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="targetWeight">Target Harvest Weight (grams)</label>
+            <input type="number" id="targetWeight" value="1000" min="50" step="50" placeholder="e.g. 1000g = 1kg">
+        </div>
+
+        <div class="form-group">
+            <label for="targetFcr">Expected FCR (Skretting Range 1.0 - 1.3)</label>
+            <input type="number" id="targetFcr" value="1.15" min="0.8" max="2.0" step="0.01">
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-calc" id="btnGenerate">Generate Production Plan</button>
+        <button class="btn-whatsapp" id="btnWhatsApp">Share Plan via WhatsApp</button>
+    </div>
+
+    <div class="summary-card" id="summaryCard">
+        <h2>Production Summary & Stocking Analysis</h2>
+
+        <div id="densityNotice" class="density-warning"></div>
+
+        <div class="metric-grid" style="margin-top: 12px;">
+            <div class="metric">
+                <div class="metric-title">Est. Duration to Harvest</div>
+                <div class="metric-value" id="resDuration">-</div>
+            </div>
+            <div class="metric">
+                <div class="metric-title">Est. Harvest Date</div>
+                <div class="metric-value" id="resHarvestDate">-</div>
+            </div>
+            <div class="metric">
+                <div class="metric-title">Total Feed Required</div>
+                <div class="metric-value" id="resTotalFeed">-</div>
+            </div>
+            <div class="metric">
+                <div class="metric-title">Total 15kg Skretting Bags</div>
+                <div class="metric-value" id="resBags">-</div>
+            </div>
+        </div>
+
+        <div class="breakdown-title">Skretting Feed Pellet Size Requirements (15kg Bags)</div>
+        <ul class="breakdown-list">
+            <li><span>1.5mm / 2.0mm Starter Feed (5g - 30g):</span> <strong id="resFeed2mm">-</strong></li>
+            <li><span>3.0mm Grower Feed (30g - 100g):</span> <strong id="resFeed3mm">-</strong></li>
+            <li><span>4.0mm Grower Feed (100g - 300g):</span> <strong id="resFeed4mm">-</strong></li>
+            <li><span>6.0mm Finisher Feed (300g - 600g):</span> <strong id="resFeed6mm">-</strong></li>
+            <li><span>9.0mm Extra Finisher (600g to Target):</span> <strong id="resFeed9mm">-</strong></li>
+        </ul>
+
+        <div class="breakdown-title">Estimated Feed Cost Breakdown</div>
+        <ul class="breakdown-list">
+            <li><span>1.5/2.0mm (@ ₦24,500/bag):</span> <strong id="cost2mm">₦0</strong></li>
+            <li><span>3.0mm (@ ₦22,800/bag):</span> <strong id="cost3mm">₦0</strong></li>
+            <li><span>4.0mm (@ ₦21,500/bag):</span> <strong id="cost4mm">₦0</strong></li>
+            <li><span>6.0mm (@ ₦20,500/bag):</span> <strong id="cost6mm">₦0</strong></li>
+            <li><span>9.0mm (@ ₦20,000/bag):</span> <strong id="cost9mm">₦0</strong></li>
+            <li class="total-row"><span>Total Estimated Feed Cost:</span> <strong id="resTotalCost">₦0</strong></li>
+        </ul>
+
+        <div class="note">
+            * Calculations assume an average daily growth rate for Clarias gariepinus under standard water quality management. Feed bags are calculated based on standard 15kg Skretting commercial bags rounded up to the nearest whole bag per size phase.
+        </div>
+    </div>
+</div>
+
+<script>
+    // Skretting 15kg Bag Prices (NGN Reference)
+    const SKRETTING_PRICES = {
+        size2mm: 24500,
+        size3mm: 22800,
+        size4mm: 21500,
+        size6mm: 20500,
+        size9mm: 20000
+    };
+
+    // Recommended Max Density per Unit Volume/Area
+    const DENSITY_LIMITS = {
+        concrete: { maxDensity: 60, unit: 'm³', label: 'Cubic Meters (m³)' },
+        tarpaulin: { maxDensity: 50, unit: 'm³', label: 'Cubic Meters (m³)' },
+        earthen: { maxDensity: 20, unit: 'm²', label: 'Surface Area (m²)' },
+        ras: { maxDensity: 120, unit: 'm³', label: 'Cubic Meters (m³)' }
+    };
+
+    let currentSummary = null;
+
+    // Update label units when pond type changes
+    document.getElementById('pondType').addEventListener('change', function() {
+        const type = this.value;
+        const config = DENSITY_LIMITS[type];
+        document.getElementById('unitLabel').innerText = type === 'earthen' 
+            ? 'Surface Area in Square Meters (m²)' 
+            : 'Volume in Cubic Meters (m³)';
+    });
+
+    function formatCurrency(amount) {
+        return '₦' + amount.toLocaleString('en-NG');
+    }
+
+    function calculateSummary() {
+        const pondType = document.getElementById('pondType').value;
+        const pondDim = parseFloat(document.getElementById('pondDimension').value) || 0;
+        const numFish = parseInt(document.getElementById('numFish').value) || 0;
+        const initialWeight = parseFloat(document.getElementById('stockingSize').value) || 10;
+        const targetWeight = parseFloat(document.getElementById('targetWeight').value) || 1000;
+        const fcr = parseFloat(document.getElementById('targetFcr').value) || 1.15;
+
+        if (numFish <= 0 || pondDim <= 0) {
+            alert('Please enter valid positive numbers for stocking quantity and pond size.');
+            return;
+        }
+
+        if (targetWeight <= initialWeight) {
+            alert('Target harvest weight must be greater than initial stocking weight.');
+            return;
+        }
+
+        // 1. Stocking Density Check
+        const densityConfig = DENSITY_LIMITS[pondType];
+        const currentDensity = numFish / pondDim;
+        const maxRecommendedFish = Math.floor(densityConfig.maxDensity * pondDim);
+
+        const densityNotice = document.getElementById('densityNotice');
+        densityNotice.style.display = 'block';
+
+        if (currentDensity > densityConfig.maxDensity) {
+            densityNotice.className = 'density-warning density-high';
+            densityNotice.innerHTML = `<strong>High Stocking Density Warning:</strong> Your density is <strong>${currentDensity.toFixed(1)} fish/${densityConfig.unit}</strong>. Recommended max for ${pondType} is <strong>${densityConfig.maxDensity} fish/${densityConfig.unit}</strong> (Max ~${maxRecommendedFish.toLocaleString()} fish for this size). Ensure aeration & frequent water exchange!`;
+        } else {
+            densityNotice.className = 'density-warning density-ok';
+            densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Your density is <strong>${currentDensity.toFixed(1)} fish/${densityConfig.unit}</strong> (Recommended max: ${densityConfig.maxDensity} fish/${densityConfig.unit}).`;
+        }
+
+        // 2. Feed Quantities per Pellet Stage (in Grams per Fish)
+        // Stage boundaries: 5-30g (2mm), 30-100g (3mm), 100-300g (4mm), 300-600g (6mm), 600g+ (9mm)
+        let g2mm = 0, g3mm = 0, g4mm = 0, g6mm = 0, g9mm = 0;
+
+        // Phase 1: 2mm (5g to 30g)
+        if (initialWeight < 30) {
+            const endStage = Math.min(targetWeight, 30);
+            g2mm = (endStage - initialWeight) * fcr;
+        }
+
+        // Phase 2: 3mm (30g to 100g)
+        if (targetWeight > 30 && initialWeight < 100) {
+            const startStage = Math.max(initialWeight, 30);
+            const endStage = Math.min(targetWeight, 100);
+            g3mm = (endStage - startStage) * fcr;
+        }
+
+        // Phase 3: 4mm (100g to 300g)
+        if (targetWeight > 100 && initialWeight < 300) {
+            const startStage = Math.max(initialWeight, 100);
+            const endStage = Math.min(targetWeight, 300);
+            g4mm = (endStage - startStage) * fcr;
+        }
+
+        // Phase 4: 6mm (300g to 600g)
+        if (targetWeight > 300 && initialWeight < 600) {
+            const startStage = Math.max(initialWeight, 300);
+            const endStage = Math.min(targetWeight, 600);
+            g6mm = (endStage - startStage) * fcr;
+        }
+
+        // Phase 5: 9mm (600g to targetWeight)
+        if (targetWeight > 600) {
+            const startStage = Math.max(initialWeight, 600);
+            g9mm = (targetWeight - startStage) * fcr;
+        }
+
+        // Convert total feed per size for whole stock into Kg
+        const kg2mm = (g2mm * numFish) / 1000;
+        const kg3mm = (g3mm * numFish) / 1000;
+        const kg4mm = (g4mm * numFish) / 1000;
+        const kg6mm = (g6mm * numFish) / 1000;
+        const kg9mm = (g9mm * numFish) / 1000;
+
+        const totalFeedKg = kg2mm + kg3mm + kg4mm + kg6mm + kg9mm;
+
+        // Skretting Bag calculation (15kg bags)
+        const bags2mm = kg2mm > 0 ? Math.ceil(kg2mm / 15) : 0;
+        const bags3mm = kg3mm > 0 ? Math.ceil(kg3mm / 15) : 0;
+        const bags4mm = kg4mm > 0 ? Math.ceil(kg4mm / 15) : 0;
+        const bags6mm = kg6mm > 0 ? Math.ceil(kg6mm / 15) : 0;
+        const bags9mm = kg9mm > 0 ? Math.ceil(kg9mm / 15) : 0;
+
+        const totalBags = bags2mm + bags3mm + bags4mm + bags6mm + bags9mm;
+
+        // Cost Calculation
+        const cost2mm = bags2mm * SKRETTING_PRICES.size2mm;
+        const cost3mm = bags3mm * SKRETTING_PRICES.size3mm;
+        const cost4mm = bags4mm * SKRETTING_PRICES.size4mm;
+        const cost6mm = bags6mm * SKRETTING_PRICES.size6mm;
+        const cost9mm = bags9mm * SKRETTING_PRICES.size9mm;
+
+        const totalCost = cost2mm + cost3mm + cost4mm + cost6mm + cost9mm;
+
+        // 3. Cycle Duration Estimator (Clarias growth curve approximation)
+        // Average daily growth rate (SGR) ~ 1.5% to 2.5% daily weight increase
+        const totalGainG = targetWeight - initialWeight;
+        // Approx average daily gain in grams (increases as fish grow, avg ~ 5.5g/day to reach 1kg in ~5 months)
+        let estDays = 0;
+        if (targetWeight <= 100) estDays = totalGainG / 1.5;
+        else if (targetWeight <= 500) estDays = 40 + (targetWeight - 100) / 4.5;
+        else estDays = 120 + (targetWeight - 500) / 7.0;
+
+        estDays = Math.round(estDays);
+        const estMonths = (estDays / 30).toFixed(1);
+
+        const harvestDate = new Date();
+        harvestDate.setDate(harvestDate.getDate() + estDays);
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', options);
+
+        // Store active summary state
+        currentSummary = {
+            numFish,
+            pondType,
+            initialWeight,
+            targetWeight,
+            totalFeedKg: totalFeedKg.toFixed(1),
+            totalBags,
+            estDays,
+            estMonths,
+            formattedHarvestDate,
+            kg2mm: kg2mm.toFixed(1), bags2mm, cost2mm,
+            kg3mm: kg3mm.toFixed(1), bags3mm, cost3mm,
+            kg4mm: kg4mm.toFixed(1), bags4mm, cost4mm,
+            kg6mm: kg6mm.toFixed(1), bags6mm, cost6mm,
+            kg9mm: kg9mm.toFixed(1), bags9mm, cost9mm,
+            totalCost
+        };
+
+        // Render UI values
+        document.getElementById('resDuration').innerText = `${estDays} Days (~${estMonths} mos)`;
+        document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
+        document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
+        document.getElementById('resBags').innerText = `${totalBags} Bags (15kg)`;
+
+        document.getElementById('resFeed2mm').innerText = `${kg2mm.toFixed(1)} KG (${bags2mm} bags)`;
+        document.getElementById('resFeed3mm').innerText = `${kg3mm.toFixed(1)} KG (${bags3mm} bags)`;
+        document.getElementById('resFeed4mm').innerText = `${kg4mm.toFixed(1)} KG (${bags4mm} bags)`;
+        document.getElementById('resFeed6mm').innerText = `${kg6mm.toFixed(1)} KG (${bags6mm} bags)`;
+        document.getElementById('resFeed9mm').innerText = `${kg9mm.toFixed(1)} KG (${bags9mm} bags)`;
+
+        document.getElementById('cost2mm').innerText = formatCurrency(cost2mm);
+        document.getElementById('cost3mm').innerText = formatCurrency(cost3mm);
+        document.getElementById('cost4mm').innerText = formatCurrency(cost4mm);
+        document.getElementById('cost6mm').innerText = formatCurrency(cost6mm);
+        document.getElementById('cost9mm').innerText = formatCurrency(cost9mm);
+        document.getElementById('resTotalCost').innerText = formatCurrency(totalCost);
+
+        const summaryCard = document.getElementById('summaryCard');
+        summaryCard.style.display = 'block';
+        summaryCard.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function shareWhatsApp() {
+        if (!currentSummary) {
+            calculateSummary();
+            if (!currentSummary) return;
+        }
+
+        const text = `*Skretting Fish Production Plan*
+---------------------------
+- Stocking Quantity: ${currentSummary.numFish.toLocaleString()} fish
+- Initial Size: ${currentSummary.initialWeight}g
+- Target Weight: ${currentSummary.targetWeight}g
+- Est. Cycle: ${currentSummary.estDays} Days (~${currentSummary.estMonths} mos)
+- Est. Harvest Date: ${currentSummary.formattedHarvestDate}
+- Total Skretting Feed: ${currentSummary.totalFeedKg} KG (${currentSummary.totalBags} x 15kg bags)
+---------------------------
+SKRETTING FEED SIZES:
+- 1.5mm/2.0mm: ${currentSummary.kg2mm} KG (${currentSummary.bags2mm} bags)
+- 3.0mm: ${currentSummary.kg3mm} KG (${currentSummary.bags3mm} bags)
+- 4.0mm: ${currentSummary.kg4mm} KG (${currentSummary.bags4mm} bags)
+- 6.0mm: ${currentSummary.kg6mm} KG (${currentSummary.bags6mm} bags)
+- 9.0mm: ${currentSummary.kg9mm} KG (${currentSummary.bags9mm} bags)
+---------------------------
+ESTIMATED FEED COST:
+*TOTAL: ${formatCurrency(currentSummary.totalCost)}*`;
+
+        const encodedText = encodeURIComponent(text);
+        window.location.href = `whatsapp://send?text=${encodedText}`;
+    }
+
+    document.getElementById('btnGenerate').addEventListener('click', calculateSummary);
+    document.getElementById('btnWhatsApp').addEventListener('click', shareWhatsApp);
+</script>
+
+</body>
+</html>
+
