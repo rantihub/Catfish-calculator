@@ -606,7 +606,7 @@
         stageListEl.innerHTML = '';
         stageResults.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${item.bagSize}kg)</strong>`;
+            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''})</strong>`;
             stageListEl.appendChild(li);
         });
 
@@ -636,12 +636,14 @@
 
         let stageText = '';
         currentSummary.stageResults.forEach(item => {
-            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} bag[s] @ ${item.bagSize}kg)\n`;
+            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
+            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} ${bagLabel})\n`;
         });
 
         let costBreakdownText = '';
         currentSummary.costResults.forEach(item => {
-            costBreakdownText += `- ${item.feedKey}: ${item.bags} bag(s) @ ${formatCurrency(item.unitPrice)} = ${formatCurrency(item.totalCost)}\n`;
+            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
+            costBreakdownText += `- ${item.feedKey}: ${item.bags} ${bagLabel} @ ${formatCurrency(item.unitPrice)} = ${formatCurrency(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
