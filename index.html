@@ -364,7 +364,7 @@
             </select>
         </div>
 
-        <div class="form-group">
+        <div class="form-group full-width">
             <label for="targetFcr">Applied FCR Adjustment</label>
             <input type="number" id="targetFcr" value="1.10" min="0.5" max="2.5" step="0.01">
         </div>
@@ -390,12 +390,12 @@
                 <div class="metric-value" id="resTotalFeed">-</div>
             </div>
             <div class="metric">
-                <div class="metric-title">Total 15kg Equivalent Bags</div>
-                <div class="metric-value" id="resBags">-</div>
-            </div>
-            <div class="metric">
                 <div class="metric-title">Target Weight</div>
                 <div class="metric-value" id="resTargetWeight">-</div>
+            </div>
+            <div class="metric">
+                <div class="metric-title">Est. Duration</div>
+                <div class="metric-value" id="resDuration">-</div>
             </div>
         </div>
 
@@ -404,45 +404,45 @@
             <!-- Dynamic Feed Stages Rendered Here -->
         </ul>
 
-        <div class="breakdown-title">Cost &amp; Valuation Summary</div>
+        <div class="breakdown-title">Feed Value Calculation Breakdown</div>
         <ul class="breakdown-list" id="costList">
-            <!-- Dynamic Costs Rendered Here -->
+            <!-- Dynamic Costs & Valuation Calculations Rendered Here -->
         </ul>
 
         <div class="note">
-            * Calculations scale baseline growth metrics relative to selected harvest weight. Prices applied: Perla Larva (₦14,000), 0.5mm (₦57,450), 0.7mm (₦57,450), 1.1mm (₦38,950), 1.8mm (₦23,700), 2mm (₦31,200), 3mm (₦25,800), 4.5mm (₦22,650), 6mm (₦21,150), 8mm (₦19,650).
+            * Specific bag sizes applied: Perla Larva (1kg), 0.5mm - 1.8mm (5kg), 2mm and above (25kg). Total Feed Value accounts for unit bag prices calculated against required bag counts.
         </div>
     </div>
 </div>
 
 <script>
-    // Feed Price Reference List
-    const PRICE_LIST = {
-        "Perla Larva 0.1-0.3mm": 14000,
-        "0.5mm": 57450,
-        "0.7mm": 57450,
-        "1.1mm": 38950,
-        "1.8mm": 23700,
-        "2mm": 31200,
-        "3mm": 25800,
-        "4.5mm": 22650,
-        "6mm": 21150,
-        "8mm": 19650
+    // Feed Configuration & Specific Bag Weights
+    const FEED_CONFIG = {
+        "Perla Larva 0.1-0.3mm": { price: 14000, bagSize: 1 },
+        "0.5mm": { price: 57450, bagSize: 5 },
+        "0.7mm": { price: 57450, bagSize: 5 },
+        "1.1mm": { price: 38950, bagSize: 5 },
+        "1.8mm": { price: 23700, bagSize: 5 },
+        "2mm": { price: 31200, bagSize: 25 },
+        "3mm": { price: 25800, bagSize: 25 },
+        "4.5mm": { price: 22650, bagSize: 25 },
+        "6mm": { price: 21150, bagSize: 25 },
+        "8mm": { price: 19650, bagSize: 25 }
     };
 
     // Stage Feed Rules per 1,000 Fish Baseline (FCR 1.1)
     const STAGE_RULES = [
-        { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, kgPer1000: 0.5, bagSize: 5 },
-        { id: 1, name: "Fry Size", feedKey: "0.5mm", startG: 0.05, endG: 1.0, kgPer1000: 0.5, bagSize: 5 },
-        { id: 2, name: "Pre-Fingerlings", feedKey: "1.1mm", startG: 1.0, endG: 2.0, kgPer1000: 1.5, bagSize: 10 },
-        { id: 3, name: "Fingerlings", feedKey: "1.8mm", startG: 2.0, endG: 4.0, kgPer1000: 2.0, bagSize: 15 },
-        { id: 4, name: "Post Fingerlings", feedKey: "2mm", startG: 4.0, endG: 6.0, kgPer1000: 2.0, bagSize: 15 },
-        { id: 5, name: "Juveniles Size", feedKey: "2mm", startG: 6.0, endG: 10.0, kgPer1000: 5.0, bagSize: 15 },
-        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, kgPer1000: 60.0, bagSize: 15 },
-        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, kgPer1000: 180.0, bagSize: 15 },
-        { id: 8, name: "Medium Grower", feedKey: "4.5mm", startG: 200.0, endG: 550.0, kgPer1000: 360.0, bagSize: 15 },
-        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, kgPer1000: 495.0, bagSize: 15 },
-        { id: 10, name: "Adult / Large", feedKey: "8mm", startG: 1000.0, endG: 3000.0, kgPer1000: 2200.0, bagSize: 15 }
+        { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, kgPer1000: 0.5 },
+        { id: 1, name: "Fry Size", feedKey: "0.5mm", startG: 0.05, endG: 1.0, kgPer1000: 0.5 },
+        { id: 2, name: "Pre-Fingerlings", feedKey: "1.1mm", startG: 1.0, endG: 2.0, kgPer1000: 1.5 },
+        { id: 3, name: "Fingerlings", feedKey: "1.8mm", startG: 2.0, endG: 4.0, kgPer1000: 2.0 },
+        { id: 4, name: "Post Fingerlings", feedKey: "2mm", startG: 4.0, endG: 6.0, kgPer1000: 2.0 },
+        { id: 5, name: "Juveniles Size", feedKey: "2mm", startG: 6.0, endG: 10.0, kgPer1000: 5.0 },
+        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, kgPer1000: 60.0 },
+        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, kgPer1000: 180.0 },
+        { id: 8, name: "Medium Grower", feedKey: "4.5mm", startG: 200.0, endG: 550.0, kgPer1000: 360.0 },
+        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, kgPer1000: 495.0 },
+        { id: 10, name: "Adult / Large", feedKey: "8mm", startG: 1000.0, endG: 3000.0, kgPer1000: 2200.0 }
     ];
 
     let currentSummary = null;
@@ -495,7 +495,7 @@
 
         const fcrScale = userFcr / 1.1;
 
-        // Stocking density assessment
+        // Stocking density check
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
@@ -506,16 +506,16 @@
             const actualDensity = numFish / dims.volM;
             if (actualDensity > recDensityPerM3) {
                 densityNotice.className = 'density-warning density-high';
-                densityNotice.innerHTML = `<strong>High Density Alert:</strong> Actual density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Recommended limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Max ~<strong>${recommendedStockCount.toLocaleString()} fish</strong> for this pond size).`;
+                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Recommended max: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
             } else {
                 densityNotice.className = 'density-warning density-ok';
-                densityNotice.innerHTML = `<strong>Optimal Density:</strong> Actual density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Recommended max: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
+                densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Recommended max: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
             }
         } else {
             densityNotice.style.display = 'none';
         }
 
-        // Calculate feed per pellet size
+        // Calculate feed quantities
         const feedMap = {};
         let totalFeedKg = 0;
         let totalEstDays = 0;
@@ -532,12 +532,17 @@
             const stageKg = (stage.kgPer1000 / 1000) * numFish * fcrScale * stageGainFactor;
             totalFeedKg += stageKg;
 
+            const config = FEED_CONFIG[stage.feedKey];
+
             if (!feedMap[stage.feedKey]) {
-                feedMap[stage.feedKey] = { kg: 0, bagSize: stage.bagSize, price: PRICE_LIST[stage.feedKey] || 0 };
+                feedMap[stage.feedKey] = { 
+                    kg: 0, 
+                    bagSize: config.bagSize, 
+                    price: config.price 
+                };
             }
             feedMap[stage.feedKey].kg += stageKg;
 
-            // Approx growth days calculation
             const stageDays = (stage.endG - stage.startG) * 0.18 * stageGainFactor;
             totalEstDays += stageDays;
         });
@@ -550,7 +555,6 @@
         const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', dateOptions);
 
         let totalCost = 0;
-        let totalBagsEquivalent = 0;
         const stageResults = [];
         const costResults = [];
 
@@ -561,19 +565,18 @@
             const cost = fullBagsCount * data.price;
 
             totalCost += cost;
-            totalBagsEquivalent += (data.kg / 15);
 
             stageResults.push({
                 feedKey,
                 kg: data.kg.toFixed(1),
                 bags: fullBagsCount,
-                bagSize: data.bagSize,
-                cost
+                bagSize: data.bagSize
             });
 
             costResults.push({
                 feedKey,
                 bags: fullBagsCount,
+                bagSize: data.bagSize,
                 unitPrice: data.price,
                 totalCost: cost
             });
@@ -585,22 +588,25 @@
             totalEstDays,
             formattedHarvestDate,
             totalFeedKg: totalFeedKg.toFixed(1),
-            totalBagsEquivalent: totalBagsEquivalent.toFixed(1),
             totalCost,
-            stageResults
+            stageResults,
+            costResults,
+            areaFt: dims.areaFt.toFixed(1),
+            areaM: dims.areaM.toFixed(2),
+            recommendedStockCount
         };
 
-        // Render UI Data
+        // Render UI metrics
         document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
         document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
-        document.getElementById('resBags').innerText = `~${totalBagsEquivalent.toFixed(1)} Bags (15kg Eq)`;
         document.getElementById('resTargetWeight').innerText = targetHarvestG >= 1000 ? `${(targetHarvestG / 1000).toFixed(1)} KG` : `${targetHarvestG} Grams`;
+        document.getElementById('resDuration').innerText = `~${totalEstDays} Days (${(totalEstDays / 30).toFixed(1)} mos)`;
 
         const stageListEl = document.getElementById('stageList');
         stageListEl.innerHTML = '';
         stageResults.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bags @ ${item.bagSize}kg)</strong>`;
+            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${item.bagSize}kg)</strong>`;
             stageListEl.appendChild(li);
         });
 
@@ -608,13 +614,13 @@
         costListEl.innerHTML = '';
         costResults.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey} (${item.bags} bags @ ${formatCurrency(item.unitPrice)}):</span> <strong>${formatCurrency(item.totalCost)}</strong>`;
+            li.innerHTML = `<span>${item.feedKey} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${formatCurrency(item.unitPrice)}):</span> <strong>${formatCurrency(item.totalCost)}</strong>`;
             costListEl.appendChild(li);
         });
 
         const totalLi = document.createElement('li');
         totalLi.className = 'total-row';
-        totalLi.innerHTML = `<span>Total Estimated Feed Value:</span> <strong>${formatCurrency(totalCost)}</strong>`;
+        totalLi.innerHTML = `<span>Total Feed Value:</span> <strong>${formatCurrency(totalCost)}</strong>`;
         costListEl.appendChild(totalLi);
 
         const summaryCard = document.getElementById('summaryCard');
@@ -630,21 +636,30 @@
 
         let stageText = '';
         currentSummary.stageResults.forEach(item => {
-            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} bags)\n`;
+            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} bag[s] @ ${item.bagSize}kg)\n`;
+        });
+
+        let costBreakdownText = '';
+        currentSummary.costResults.forEach(item => {
+            costBreakdownText += `- ${item.feedKey}: ${item.bags} bag(s) @ ${formatCurrency(item.unitPrice)} = ${formatCurrency(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
 
         const text = `*Skretting Catfish Production Plan*
 ---------------------------
+- Pond Dimensions: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
+- Rec. Max Stocking: ~${currentSummary.recommendedStockCount.toLocaleString()} fish
 - Stocking Population: ${currentSummary.numFish.toLocaleString()} fish
 - Target Harvest Weight: ${targetLabel}
-- Est. Duration: ~${currentSummary.totalEstDays} Days
+- Est. Cycle Duration: ~${currentSummary.totalEstDays} Days
 - Target Harvest Date: ${currentSummary.formattedHarvestDate}
-- Total Feed Needed: ${currentSummary.totalFeedKg} KG
+- Total Feed Required: ${currentSummary.totalFeedKg} KG
 ---------------------------
 FEED REQUIREMENT BREAKDOWN:
 ${stageText}---------------------------
+FEED VALUE CALCULATION BREAKDOWN:
+${costBreakdownText}---------------------------
 *TOTAL FEED VALUE: ${formatCurrency(currentSummary.totalCost)}*`;
 
         const encodedText = encodeURIComponent(text);
