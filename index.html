@@ -67,6 +67,15 @@
             .form-grid {
                 grid-template-columns: 1fr 1fr;
             }
+            .full-width {
+                grid-column: span 2;
+            }
+            .three-col {
+                grid-column: span 2;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 12px;
+            }
         }
 
         .form-group {
@@ -94,6 +103,40 @@
 
         input:focus, select:focus {
             border-color: var(--primary);
+        }
+
+        .calc-display-box {
+            background: #eeb20015;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 4px;
+        }
+
+        .calc-display-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.85rem;
+        }
+
+        .calc-item {
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .calc-item span {
+            display: block;
+            color: #718096;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+        }
+
+        .calc-item strong {
+            color: var(--primary-dark);
+            font-size: 0.95rem;
         }
 
         .btn-group {
@@ -246,10 +289,50 @@
 <div class="container">
     <header>
         <h1>Skretting Catfish Feed & Production Planner</h1>
-        <p>Based on Standard Catfish Growth Stages (FCR = 1.1 Baseline)</p>
+        <p>Catfish Growth Stages (FCR = 1.1 Baseline)</p>
     </header>
 
     <div class="form-grid">
+        <!-- Pond Dimensions Section -->
+        <div class="form-group three-col">
+            <div class="form-group">
+                <label for="pondLength">Length (ft)</label>
+                <input type="number" id="pondLength" value="20" min="1" step="0.5">
+            </div>
+            <div class="form-group">
+                <label for="pondWidth">Width (ft)</label>
+                <input type="number" id="pondWidth" value="10" min="1" step="0.5">
+            </div>
+            <div class="form-group">
+                <label for="pondDepth">Depth / Height (ft)</label>
+                <input type="number" id="pondDepth" value="4" min="0.5" step="0.5">
+            </div>
+        </div>
+
+        <!-- Dynamic Dimension Measurements Display -->
+        <div class="form-group full-width">
+            <div class="calc-display-box">
+                <div class="calc-display-grid">
+                    <div class="calc-item">
+                        <span>Surface Area (ft²)</span>
+                        <strong id="dispAreaFt">200 ft²</strong>
+                    </div>
+                    <div class="calc-item">
+                        <span>Surface Area (m²)</span>
+                        <strong id="dispAreaM">18.58 m²</strong>
+                    </div>
+                    <div class="calc-item">
+                        <span>Pond Volume (ft³)</span>
+                        <strong id="dispVolFt">800 ft³</strong>
+                    </div>
+                    <div class="calc-item">
+                        <span>Pond Volume (m³)</span>
+                        <strong id="dispVolM">22.65 m³</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="form-group">
             <label for="numFish">Total Population (Fish)</label>
             <input type="number" id="numFish" value="1000" min="1" step="10">
@@ -285,13 +368,7 @@
             <input type="number" id="targetFcr" value="1.10" min="0.5" max="2.5" step="0.01">
         </div>
 
-        <div class="form-group">
-            <label for="pondVolume">Total Pond Volume / Area</label>
-            <input type="number" id="pondVolume" value="20" min="1" step="0.5" placeholder="e.g. 20">
-            <span style="font-size: 0.75rem; color: #718096; margin-top: 3px;">Volume in m³ (or m² for Earthen)</span>
-        </div>
-
-        <div class="form-group">
+        <div class="form-group full-width">
             <label for="bagPrice">Avg Cost per 15kg Bag (₦)</label>
             <input type="number" id="bagPrice" value="21500" step="100">
         </div>
@@ -337,7 +414,7 @@
         </ul>
 
         <div class="note">
-            * Calculations use standard growth stages scaled to population and target FCR. Bag counts are calculated based on standard 15kg bags (starter feed totals are reported directly in kg).
+            * Calculations use standard growth stages scaled to population and target FCR. Bag counts are calculated based on standard 15kg bags. Conversions: 1 m² = 10.7639 ft², 1 m³ = 35.3147 ft³.
         </div>
     </div>
 </div>
@@ -365,16 +442,42 @@
         return '₦' + amount.toLocaleString('en-NG');
     }
 
+    // Dynamic Pond Area & Volume Calculations
+    function updatePondDimensions() {
+        const lengthFt = parseFloat(document.getElementById('pondLength').value) || 0;
+        const widthFt = parseFloat(document.getElementById('pondWidth').value) || 0;
+        const depthFt = parseFloat(document.getElementById('pondDepth').value) || 0;
+
+        const areaFt = lengthFt * widthFt;
+        const areaM = areaFt / 10.7639;
+
+        const volFt = areaFt * depthFt;
+        const volM = volFt / 35.3147;
+
+        document.getElementById('dispAreaFt').innerText = `${areaFt.toFixed(1)} ft²`;
+        document.getElementById('dispAreaM').innerText = `${areaM.toFixed(2)} m²`;
+        document.getElementById('dispVolFt').innerText = `${volFt.toFixed(1)} ft³`;
+        document.getElementById('dispVolM').innerText = `${volM.toFixed(2)} m³`;
+
+        return { areaFt, areaM, volFt, volM };
+    }
+
+    // Attach real-time dimension listeners
+    ['pondLength', 'pondWidth', 'pondDepth'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePondDimensions);
+    });
+
     function calculateSummary() {
         const numFish = parseInt(document.getElementById('numFish').value) || 0;
         const startStageIdx = parseInt(document.getElementById('stockingStage').value);
         const targetStageIdx = parseInt(document.getElementById('targetStage').value);
         const userFcr = parseFloat(document.getElementById('targetFcr').value) || 1.1;
-        const pondVol = parseFloat(document.getElementById('pondVolume').value) || 0;
         const bagPrice = parseFloat(document.getElementById('bagPrice').value) || 0;
 
+        const dims = updatePondDimensions();
+
         if (numFish <= 0) {
-            alert('Please enter a valid population.');
+            alert('Please enter a valid fish population.');
             return;
         }
 
@@ -383,32 +486,34 @@
             return;
         }
 
-        // FCR Scale relative to standard 1.1 in reference chart
+        // FCR Scale relative to baseline FCR (1.1)
         const fcrScale = userFcr / 1.1;
 
-        // Density Check based on target stage optimum density
+        // Stocking Density Recommendations
         const targetStageData = GROWTH_STAGES[targetStageIdx];
+        const recDensityPerM3 = targetStageData.density;
+        const recommendedStockCount = Math.floor(recDensityPerM3 * dims.volM);
+
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
-        if (pondVol > 0) {
-            const actualDensity = numFish / pondVol;
-            const recDensity = targetStageData.density;
-            if (actualDensity > recDensity) {
+        if (dims.volM > 0) {
+            const actualDensity = numFish / dims.volM;
+            if (actualDensity > recDensityPerM3) {
                 densityNotice.className = 'density-warning density-high';
-                densityNotice.innerHTML = `<strong>Density Warning:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum stocking density for ${targetStageData.name} is <strong>${recDensity} fish/m³</strong>. Ensure aeration & regular water changes!`;
+                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Your density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. For <strong>${targetStageData.name}</strong>, optimum density is <strong>${recDensityPerM3} fish/m³</strong> (Recommended max: <strong>~${recommendedStockCount.toLocaleString()} fish</strong> for this pond size).`;
             } else {
                 densityNotice.className = 'density-warning density-ok';
-                densityNotice.innerHTML = `<strong>Stocking Density OK:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Optimum for target stage: ${recDensity} fish/m³).`;
+                densityNotice.innerHTML = `<strong>Optimal Density:</strong> Your density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Recommended max for ${targetStageData.name} is <strong>~${recommendedStockCount.toLocaleString()} fish</strong> (${recDensityPerM3} fish/m³).`;
             }
         } else {
             densityNotice.style.display = 'none';
         }
 
-        // Filter active stages
+        // Active Growth Stages Filtering
         const activeStages = GROWTH_STAGES.filter(s => s.id >= startStageIdx && s.id <= targetStageIdx);
 
-        // Days calculation
+        // Days & Harvest Date Calculation
         const startDay = startStageIdx > 0 ? GROWTH_STAGES[startStageIdx - 1].daysEnd : 0;
         const totalDays = targetStageData.daysEnd - startDay;
 
@@ -449,10 +554,14 @@
             totalFeedKg: totalFeedKg.toFixed(1),
             totalBags,
             totalCost,
-            stageResults
+            stageResults,
+            areaFt: dims.areaFt.toFixed(1),
+            areaM: dims.areaM.toFixed(2),
+            volM: dims.volM.toFixed(2),
+            recommendedStockCount
         };
 
-        // Render UI Data
+        // Render Summary UI
         document.getElementById('resDuration').innerText = `${totalDays} Days (~${(totalDays / 30).toFixed(1)} mos)`;
         document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
         document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
@@ -487,7 +596,9 @@
 
         const text = `*Skretting Catfish Production Plan*
 ---------------------------
-- Population: ${currentSummary.numFish.toLocaleString()} fish
+- Pond Area: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
+- Recommended Max Capacity: ~${currentSummary.recommendedStockCount.toLocaleString()} fish
+- Actual Population: ${currentSummary.numFish.toLocaleString()} fish
 - Est. Duration: ${currentSummary.totalDays} Days
 - Est. Harvest Date: ${currentSummary.formattedHarvestDate}
 - Total Feed Required: ${currentSummary.totalFeedKg} KG (~${currentSummary.totalBags} bags)
@@ -499,6 +610,9 @@ ${stageBreakdownText}---------------------------
         const encodedText = encodeURIComponent(text);
         window.location.href = `whatsapp://send?text=${encodedText}`;
     }
+
+    // Initial load setup
+    updatePondDimensions();
 
     document.getElementById('btnGenerate').addEventListener('click', calculateSummary);
     document.getElementById('btnWhatsApp').addEventListener('click', shareWhatsApp);
