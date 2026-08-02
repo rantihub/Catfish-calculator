@@ -335,10 +335,10 @@
             <select id="stockingStage">
                 <option value="0">Early Fry (0.1mm - 0.3mm)</option>
                 <option value="1">Fry (0.5mm - 0.7mm)</option>
-                <option value="2">Pre-Fingerlings (1.1mm / 1g)</option>
-                <option value="3" selected>Fingerlings (1.8mm / 2g)</option>
-                <option value="4">Post Fingerlings (2mm / 4g)</option>
-                <option value="5">Juveniles (2mm / 6g)</option>
+                <option value="2">Pre-Fingerlings (1mm / 1g)</option>
+                <option value="3" selected>Fingerlings (1.2mm / 2g)</option>
+                <option value="4">Post Fingerlings (1.5mm / 4g)</option>
+                <option value="5">Juveniles (1.8mm / 6g)</option>
                 <option value="6">Post Juveniles (2mm / 10g)</option>
             </select>
         </div>
@@ -346,13 +346,10 @@
         <div class="form-group">
             <label for="targetHarvestWeight">Target Harvest Size</label>
             <select id="targetHarvestWeight">
-                <option value="300">300 gm (Smokeable / Small)</option>
-                <option value="500">500 gm (Smokeable / Medium)</option>
-                <option value="800">800 gm (Melange / Large)</option>
+                <option value="200">200 gm (Jumbo Size)</option>
+                <option value="550">550 gm (Smokeable / Medium)</option>
                 <option value="1000" selected>1 kg (Table Size)</option>
-                <option value="1500">1.5 kg (Adult Size)</option>
-                <option value="2000">2 kg (Large Adult)</option>
-                <option value="3000">3 kg (Broodstock / Extra Large)</option>
+                <option value="2000">2 kg (Adult Size)</option>
             </select>
         </div>
 
@@ -405,7 +402,7 @@
         </ul>
 
         <div class="note">
-            * Specific bag sizes applied: Perla Larva (1kg), 0.5mm - 1.8mm (5kg), 2mm and above (25kg). Total Feed Value accounts for unit bag prices calculated against required bag counts.
+            * Packaging Rules: 0.1mm-0.3mm (1kg bag), 0.5mm to 1.8mm (5kg bag), 2mm up to 8mm (15kg bag). Figures configured to match FCR 1.1 reference chart.
         </div>
     </div>
 
@@ -414,33 +411,34 @@
 </div>
 
 <script>
-    // Feed Configuration & Specific Bag Weights
+    // Feed Configuration & Specific Bag Weights (15kg for 2mm through 8mm)
     const FEED_CONFIG = {
         "Perla Larva 0.1-0.3mm": { price: 14000, bagSize: 1 },
-        "0.5mm": { price: 57450, bagSize: 5 },
-        "0.7mm": { price: 57450, bagSize: 5 },
-        "1.1mm": { price: 38950, bagSize: 5 },
+        "0.5mm - 0.7mm": { price: 57450, bagSize: 5 },
+        "1mm": { price: 38950, bagSize: 5 },
+        "1.2mm": { price: 23700, bagSize: 5 },
+        "1.5mm": { price: 23700, bagSize: 5 },
         "1.8mm": { price: 23700, bagSize: 5 },
-        "2mm": { price: 31200, bagSize: 25 },
-        "3mm": { price: 25800, bagSize: 25 },
-        "4.5mm": { price: 22650, bagSize: 25 },
-        "6mm": { price: 21150, bagSize: 25 },
-        "8mm": { price: 19650, bagSize: 25 }
+        "2mm": { price: 31200, bagSize: 15 },
+        "3mm": { price: 25800, bagSize: 15 },
+        "4mm": { price: 22650, bagSize: 15 },
+        "6mm": { price: 21150, bagSize: 15 },
+        "8mm": { price: 19650, bagSize: 15 }
     };
 
-    // Stage Feed Rules per 1,000 Fish Baseline (FCR 1.1)
+    // Stage Feed Rules based directly on Chart Reference for 1,000 Fish Baseline (FCR = 1.1)
     const STAGE_RULES = [
         { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, kgPer1000: 0.5 },
-        { id: 1, name: "Fry Size", feedKey: "0.5mm", startG: 0.05, endG: 1.0, kgPer1000: 0.5 },
-        { id: 2, name: "Pre-Fingerlings", feedKey: "1.1mm", startG: 1.0, endG: 2.0, kgPer1000: 1.5 },
-        { id: 3, name: "Fingerlings", feedKey: "1.8mm", startG: 2.0, endG: 4.0, kgPer1000: 2.0 },
-        { id: 4, name: "Post Fingerlings", feedKey: "2mm", startG: 4.0, endG: 6.0, kgPer1000: 2.0 },
-        { id: 5, name: "Juveniles Size", feedKey: "2mm", startG: 6.0, endG: 10.0, kgPer1000: 5.0 },
-        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, kgPer1000: 60.0 },
-        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, kgPer1000: 180.0 },
-        { id: 8, name: "Medium Grower", feedKey: "4.5mm", startG: 200.0, endG: 550.0, kgPer1000: 360.0 },
-        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, kgPer1000: 495.0 },
-        { id: 10, name: "Adult / Large", feedKey: "8mm", startG: 1000.0, endG: 3000.0, kgPer1000: 2200.0 }
+        { id: 1, name: "Fry Size", feedKey: "0.5mm - 0.7mm", startG: 0.05, endG: 1.0, kgPer1000: 0.5 },
+        { id: 2, name: "Pre-Fingerlings", feedKey: "1mm", startG: 1.0, endG: 2.0, kgPer1000: 1.5 },
+        { id: 3, name: "Fingerlings Size", feedKey: "1.2mm", startG: 2.0, endG: 4.0, kgPer1000: 2.0 },
+        { id: 4, name: "Post Fingerlings", feedKey: "1.5mm", startG: 4.0, endG: 6.0, kgPer1000: 2.0 },
+        { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, kgPer1000: 5.0 },
+        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, kgPer1000: 60.0 },      // 4 bags @ 15kg
+        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, kgPer1000: 180.0 },       // 12 bags @ 15kg
+        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, kgPer1000: 360.0 },    // 24 bags @ 15kg
+        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, kgPer1000: 495.0 },     // 33 bags @ 15kg
+        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, kgPer1000: 570.0 }     // 38 bags @ 15kg
     ];
 
     let currentSummary = null;
@@ -497,7 +495,7 @@
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
-        const recDensityPerM3 = targetHarvestG >= 1000 ? 50 : (targetHarvestG >= 500 ? 60 : 80);
+        const recDensityPerM3 = targetHarvestG >= 1000 ? 50 : (targetHarvestG >= 550 ? 60 : 80);
         const recommendedStockCount = Math.floor(recDensityPerM3 * dims.volM);
 
         if (dims.volM > 0) {
@@ -608,7 +606,7 @@
         stageListEl.innerHTML = '';
         stageResults.forEach(item => {
             const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''})</strong>`;
+            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''} of ${item.bagSize}kg)</strong>`;
             stageListEl.appendChild(li);
         });
 
@@ -649,7 +647,7 @@
         let stageText = '';
         currentSummary.stageResults.forEach(item => {
             const bagLabel = item.bags > 1 ? 'bags' : 'bag';
-            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} ${bagLabel})\n`;
+            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} ${bagLabel} of ${item.bagSize}kg)\n`;
         });
 
         let costBreakdownText = '';
