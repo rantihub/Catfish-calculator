@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skretting Fish Production & Feed Planner</title>
+    <title>Skretting Catfish Production & Feed Planner</title>
     <style>
         :root {
             --primary: #006699;
@@ -13,7 +13,6 @@
             --text: #2d3748;
             --accent: #25D366;
             --border: #cbd5e0;
-            --subtle: #ebf8ff;
         }
 
         * {
@@ -32,7 +31,7 @@
         }
 
         .container {
-            max-width: 700px;
+            max-width: 750px;
             width: 100%;
             background: var(--card-bg);
             border-radius: 12px;
@@ -67,9 +66,6 @@
         @media (min-width: 550px) {
             .form-grid {
                 grid-template-columns: 1fr 1fr;
-            }
-            .full-width {
-                grid-column: span 2;
             }
         }
 
@@ -226,10 +222,10 @@
         }
 
         .density-warning {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-radius: 6px;
-            font-size: 0.82rem;
-            margin-top: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 12px;
             display: none;
         }
 
@@ -249,70 +245,75 @@
 
 <div class="container">
     <header>
-        <h1>Skretting Fish Production & Feed Planner</h1>
-        <p>Aquaculture Production, Feed Budgeting & Harvest Cycle Estimator</p>
+        <h1>Skretting Catfish Feed & Production Planner</h1>
+        <p>Based on Standard Catfish Growth Stages (FCR = 1.1 Baseline)</p>
     </header>
 
     <div class="form-grid">
         <div class="form-group">
-            <label for="pondType">Pond Infrastructure Type</label>
-            <select id="pondType">
-                <option value="concrete">Concrete Tank</option>
-                <option value="tarpaulin">Tarpaulin Tank</option>
-                <option value="earthen">Earthen Pond</option>
-                <option value="ras">RAS (Recirculating System)</option>
+            <label for="numFish">Total Population (Fish)</label>
+            <input type="number" id="numFish" value="1000" min="1" step="10">
+        </div>
+
+        <div class="form-group">
+            <label for="stockingStage">Stocking Stage (Initial Weight)</label>
+            <select id="stockingStage">
+                <option value="1">Early Fry (0.002g - Day 4)</option>
+                <option value="2">Fry Size (0.05g - Day 11)</option>
+                <option value="3">Pre-Fingerlings (1g - Day 18)</option>
+                <option value="4" selected>Fingerlings (2g - Day 25)</option>
+                <option value="5">Post Fingerlings (4g - Day 32)</option>
+                <option value="6">Juveniles (6g - Day 39)</option>
+                <option value="7">Post Juveniles (10g - Day 46)</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="pondDimension">Pond Capacity / Size</label>
-            <input type="number" id="pondDimension" value="50" min="1" step="0.5" placeholder="e.g. 50">
-            <span id="unitLabel" style="font-size: 0.75rem; color: #718096; margin-top: 3px;">Volume in Cubic Meters (m³)</span>
-        </div>
-
-        <div class="form-group">
-            <label for="numFish">Target Stocking Quantity (Fish)</label>
-            <input type="number" id="numFish" value="2500" min="1" step="10">
-        </div>
-
-        <div class="form-group">
-            <label for="stockingSize">Initial Stocking Weight (grams)</label>
-            <select id="stockingSize">
-                <option value="5">Fingerling (5g)</option>
-                <option value="10" selected>Juvenile (10g)</option>
-                <option value="15">Post-Juvenile (15g)</option>
-                <option value="30">Shooter (30g)</option>
+            <label for="targetStage">Target Harvest Stage</label>
+            <select id="targetStage">
+                <option value="6">Juveniles (6g - 10g)</option>
+                <option value="7">Post Juveniles (10g - 50g)</option>
+                <option value="8">Jumbo Size (50g - 200g)</option>
+                <option value="9">Smokeable Size (200g - 550g)</option>
+                <option value="10" selected>Table Size (550g - 1kg)</option>
+                <option value="11">Adult Size (&gt; 1kg)</option>
             </select>
         </div>
 
         <div class="form-group">
-            <label for="targetWeight">Target Harvest Weight (grams)</label>
-            <input type="number" id="targetWeight" value="1000" min="50" step="50" placeholder="e.g. 1000g = 1kg">
+            <label for="targetFcr">Applied FCR Adjustment</label>
+            <input type="number" id="targetFcr" value="1.10" min="0.5" max="2.5" step="0.01">
         </div>
 
         <div class="form-group">
-            <label for="targetFcr">Expected FCR (Skretting Range 1.0 - 1.3)</label>
-            <input type="number" id="targetFcr" value="1.15" min="0.8" max="2.0" step="0.01">
+            <label for="pondVolume">Total Pond Volume / Area</label>
+            <input type="number" id="pondVolume" value="20" min="1" step="0.5" placeholder="e.g. 20">
+            <span style="font-size: 0.75rem; color: #718096; margin-top: 3px;">Volume in m³ (or m² for Earthen)</span>
+        </div>
+
+        <div class="form-group">
+            <label for="bagPrice">Avg Cost per 15kg Bag (₦)</label>
+            <input type="number" id="bagPrice" value="21500" step="100">
         </div>
     </div>
 
     <div class="btn-group">
-        <button class="btn-calc" id="btnGenerate">Generate Production Plan</button>
-        <button class="btn-whatsapp" id="btnWhatsApp">Share Plan via WhatsApp</button>
+        <button class="btn-calc" id="btnGenerate">Generate Production Summary</button>
+        <button class="btn-whatsapp" id="btnWhatsApp">Share Summary via WhatsApp</button>
     </div>
 
     <div class="summary-card" id="summaryCard">
-        <h2>Production Summary & Stocking Analysis</h2>
+        <h2>Production Cycle Summary</h2>
 
         <div id="densityNotice" class="density-warning"></div>
 
-        <div class="metric-grid" style="margin-top: 12px;">
+        <div class="metric-grid">
             <div class="metric">
-                <div class="metric-title">Est. Duration to Harvest</div>
+                <div class="metric-title">Cycle Duration</div>
                 <div class="metric-value" id="resDuration">-</div>
             </div>
             <div class="metric">
-                <div class="metric-title">Est. Harvest Date</div>
+                <div class="metric-title">Estimated Harvest Date</div>
                 <div class="metric-value" id="resHarvestDate">-</div>
             </div>
             <div class="metric">
@@ -320,220 +321,152 @@
                 <div class="metric-value" id="resTotalFeed">-</div>
             </div>
             <div class="metric">
-                <div class="metric-title">Total 15kg Skretting Bags</div>
+                <div class="metric-title">Total 15kg Bags</div>
                 <div class="metric-value" id="resBags">-</div>
             </div>
         </div>
 
-        <div class="breakdown-title">Skretting Feed Pellet Size Requirements (15kg Bags)</div>
-        <ul class="breakdown-list">
-            <li><span>1.5mm / 2.0mm Starter Feed (5g - 30g):</span> <strong id="resFeed2mm">-</strong></li>
-            <li><span>3.0mm Grower Feed (30g - 100g):</span> <strong id="resFeed3mm">-</strong></li>
-            <li><span>4.0mm Grower Feed (100g - 300g):</span> <strong id="resFeed4mm">-</strong></li>
-            <li><span>6.0mm Finisher Feed (300g - 600g):</span> <strong id="resFeed6mm">-</strong></li>
-            <li><span>9.0mm Extra Finisher (600g to Target):</span> <strong id="resFeed9mm">-</strong></li>
+        <div class="breakdown-title">Feed Stage Breakdown (Sizes &amp; Quantities)</div>
+        <ul class="breakdown-list" id="stageList">
+            <!-- Dynamic Feed Stages Rendered Here -->
         </ul>
 
-        <div class="breakdown-title">Estimated Feed Cost Breakdown</div>
+        <div class="breakdown-title">Financial Summary</div>
         <ul class="breakdown-list">
-            <li><span>1.5/2.0mm (@ ₦24,500/bag):</span> <strong id="cost2mm">₦0</strong></li>
-            <li><span>3.0mm (@ ₦22,800/bag):</span> <strong id="cost3mm">₦0</strong></li>
-            <li><span>4.0mm (@ ₦21,500/bag):</span> <strong id="cost4mm">₦0</strong></li>
-            <li><span>6.0mm (@ ₦20,500/bag):</span> <strong id="cost6mm">₦0</strong></li>
-            <li><span>9.0mm (@ ₦20,000/bag):</span> <strong id="cost9mm">₦0</strong></li>
-            <li class="total-row"><span>Total Estimated Feed Cost:</span> <strong id="resTotalCost">₦0</strong></li>
+            <li class="total-row"><span>Total Feed Investment (Cost):</span> <strong id="resTotalCost">₦0</strong></li>
         </ul>
 
         <div class="note">
-            * Calculations assume an average daily growth rate for Clarias gariepinus under standard water quality management. Feed bags are calculated based on standard 15kg Skretting commercial bags rounded up to the nearest whole bag per size phase.
+            * Calculations use standard growth stages scaled to population and target FCR. Bag counts are calculated based on standard 15kg bags (starter feed totals are reported directly in kg).
         </div>
     </div>
 </div>
 
 <script>
-    // Skretting 15kg Bag Prices (NGN Reference)
-    const SKRETTING_PRICES = {
-        size2mm: 24500,
-        size3mm: 22800,
-        size4mm: 21500,
-        size6mm: 20500,
-        size9mm: 20000
-    };
-
-    // Recommended Max Density per Unit Volume/Area
-    const DENSITY_LIMITS = {
-        concrete: { maxDensity: 60, unit: 'm³', label: 'Cubic Meters (m³)' },
-        tarpaulin: { maxDensity: 50, unit: 'm³', label: 'Cubic Meters (m³)' },
-        earthen: { maxDensity: 20, unit: 'm²', label: 'Surface Area (m²)' },
-        ras: { maxDensity: 120, unit: 'm³', label: 'Cubic Meters (m³)' }
-    };
+    // Complete Growth Chart Data (Based on 1,000 Fish Baseline)
+    const GROWTH_STAGES = [
+        { id: 0, name: "Larvae Size", age: "1st - 3rd day", daysEnd: 3, size: "Yolk Sac", kg1000: 0, density: 150, freq: "-" },
+        { id: 1, name: "Early Fry", age: "4th - 10th day", daysEnd: 10, size: "0.1mm - 0.3mm", kg1000: 0.5, density: 140, freq: "4-5 times daily" },
+        { id: 2, name: "Fry Size", age: "11th - 17th day", daysEnd: 17, size: "0.5mm - 0.7mm", kg1000: 0.5, density: 130, freq: "4-5 times daily" },
+        { id: 3, name: "Pre-Fingerlings", age: "18th - 24th day", daysEnd: 24, size: "1.0mm", kg1000: 1.5, density: 120, freq: "4-5 times daily" },
+        { id: 4, name: "Fingerlings", age: "25th - 31st day", daysEnd: 31, size: "1.2mm", kg1000: 2.0, density: 110, freq: "3-4 times daily" },
+        { id: 5, name: "Post Fingerlings", age: "32nd - 38th day", daysEnd: 38, size: "1.5mm", kg1000: 2.0, density: 100, freq: "3-4 times daily" },
+        { id: 6, name: "Juveniles Size", age: "39th - 45th day", daysEnd: 45, size: "1.8mm", kg1000: 5.0, density: 90, freq: "2-3 times daily" },
+        { id: 7, name: "Post Juveniles", age: "46th - 75th day", daysEnd: 75, size: "2.0mm", kg1000: 60.0, density: 80, freq: "2-3 times daily" },
+        { id: 8, name: "Jumbo Size", age: "76th - 105th day", daysEnd: 105, size: "3.0mm", kg1000: 180.0, density: 70, freq: "2 times daily" },
+        { id: 9, name: "Smokeable Size", age: "106th - 137th day", daysEnd: 137, size: "4.0mm", kg1000: 360.0, density: 60, freq: "2 times daily" },
+        { id: 10, name: "Table Size", age: "138th - 167th day", daysEnd: 167, size: "6.0mm", kg1000: 495.0, density: 50, freq: "2 times daily" },
+        { id: 11, name: "Adult Size", age: "168th - 197th day", daysEnd: 197, size: "9.0mm", kg1000: 570.0, density: 40, freq: "1-2 times daily" }
+    ];
 
     let currentSummary = null;
-
-    // Update label units when pond type changes
-    document.getElementById('pondType').addEventListener('change', function() {
-        const type = this.value;
-        const config = DENSITY_LIMITS[type];
-        document.getElementById('unitLabel').innerText = type === 'earthen' 
-            ? 'Surface Area in Square Meters (m²)' 
-            : 'Volume in Cubic Meters (m³)';
-    });
 
     function formatCurrency(amount) {
         return '₦' + amount.toLocaleString('en-NG');
     }
 
     function calculateSummary() {
-        const pondType = document.getElementById('pondType').value;
-        const pondDim = parseFloat(document.getElementById('pondDimension').value) || 0;
         const numFish = parseInt(document.getElementById('numFish').value) || 0;
-        const initialWeight = parseFloat(document.getElementById('stockingSize').value) || 10;
-        const targetWeight = parseFloat(document.getElementById('targetWeight').value) || 1000;
-        const fcr = parseFloat(document.getElementById('targetFcr').value) || 1.15;
+        const startStageIdx = parseInt(document.getElementById('stockingStage').value);
+        const targetStageIdx = parseInt(document.getElementById('targetStage').value);
+        const userFcr = parseFloat(document.getElementById('targetFcr').value) || 1.1;
+        const pondVol = parseFloat(document.getElementById('pondVolume').value) || 0;
+        const bagPrice = parseFloat(document.getElementById('bagPrice').value) || 0;
 
-        if (numFish <= 0 || pondDim <= 0) {
-            alert('Please enter valid positive numbers for stocking quantity and pond size.');
+        if (numFish <= 0) {
+            alert('Please enter a valid population.');
             return;
         }
 
-        if (targetWeight <= initialWeight) {
-            alert('Target harvest weight must be greater than initial stocking weight.');
+        if (targetStageIdx <= startStageIdx) {
+            alert('Target harvest stage must be greater than initial stocking stage.');
             return;
         }
 
-        // 1. Stocking Density Check
-        const densityConfig = DENSITY_LIMITS[pondType];
-        const currentDensity = numFish / pondDim;
-        const maxRecommendedFish = Math.floor(densityConfig.maxDensity * pondDim);
+        // FCR Scale relative to standard 1.1 in reference chart
+        const fcrScale = userFcr / 1.1;
 
+        // Density Check based on target stage optimum density
+        const targetStageData = GROWTH_STAGES[targetStageIdx];
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
-        if (currentDensity > densityConfig.maxDensity) {
-            densityNotice.className = 'density-warning density-high';
-            densityNotice.innerHTML = `<strong>High Stocking Density Warning:</strong> Your density is <strong>${currentDensity.toFixed(1)} fish/${densityConfig.unit}</strong>. Recommended max for ${pondType} is <strong>${densityConfig.maxDensity} fish/${densityConfig.unit}</strong> (Max ~${maxRecommendedFish.toLocaleString()} fish for this size). Ensure aeration & frequent water exchange!`;
+        if (pondVol > 0) {
+            const actualDensity = numFish / pondVol;
+            const recDensity = targetStageData.density;
+            if (actualDensity > recDensity) {
+                densityNotice.className = 'density-warning density-high';
+                densityNotice.innerHTML = `<strong>Density Warning:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum stocking density for ${targetStageData.name} is <strong>${recDensity} fish/m³</strong>. Ensure aeration & regular water changes!`;
+            } else {
+                densityNotice.className = 'density-warning density-ok';
+                densityNotice.innerHTML = `<strong>Stocking Density OK:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Optimum for target stage: ${recDensity} fish/m³).`;
+            }
         } else {
-            densityNotice.className = 'density-warning density-ok';
-            densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Your density is <strong>${currentDensity.toFixed(1)} fish/${densityConfig.unit}</strong> (Recommended max: ${densityConfig.maxDensity} fish/${densityConfig.unit}).`;
+            densityNotice.style.display = 'none';
         }
 
-        // 2. Feed Quantities per Pellet Stage (in Grams per Fish)
-        // Stage boundaries: 5-30g (2mm), 30-100g (3mm), 100-300g (4mm), 300-600g (6mm), 600g+ (9mm)
-        let g2mm = 0, g3mm = 0, g4mm = 0, g6mm = 0, g9mm = 0;
+        // Filter active stages
+        const activeStages = GROWTH_STAGES.filter(s => s.id >= startStageIdx && s.id <= targetStageIdx);
 
-        // Phase 1: 2mm (5g to 30g)
-        if (initialWeight < 30) {
-            const endStage = Math.min(targetWeight, 30);
-            g2mm = (endStage - initialWeight) * fcr;
-        }
-
-        // Phase 2: 3mm (30g to 100g)
-        if (targetWeight > 30 && initialWeight < 100) {
-            const startStage = Math.max(initialWeight, 30);
-            const endStage = Math.min(targetWeight, 100);
-            g3mm = (endStage - startStage) * fcr;
-        }
-
-        // Phase 3: 4mm (100g to 300g)
-        if (targetWeight > 100 && initialWeight < 300) {
-            const startStage = Math.max(initialWeight, 100);
-            const endStage = Math.min(targetWeight, 300);
-            g4mm = (endStage - startStage) * fcr;
-        }
-
-        // Phase 4: 6mm (300g to 600g)
-        if (targetWeight > 300 && initialWeight < 600) {
-            const startStage = Math.max(initialWeight, 300);
-            const endStage = Math.min(targetWeight, 600);
-            g6mm = (endStage - startStage) * fcr;
-        }
-
-        // Phase 5: 9mm (600g to targetWeight)
-        if (targetWeight > 600) {
-            const startStage = Math.max(initialWeight, 600);
-            g9mm = (targetWeight - startStage) * fcr;
-        }
-
-        // Convert total feed per size for whole stock into Kg
-        const kg2mm = (g2mm * numFish) / 1000;
-        const kg3mm = (g3mm * numFish) / 1000;
-        const kg4mm = (g4mm * numFish) / 1000;
-        const kg6mm = (g6mm * numFish) / 1000;
-        const kg9mm = (g9mm * numFish) / 1000;
-
-        const totalFeedKg = kg2mm + kg3mm + kg4mm + kg6mm + kg9mm;
-
-        // Skretting Bag calculation (15kg bags)
-        const bags2mm = kg2mm > 0 ? Math.ceil(kg2mm / 15) : 0;
-        const bags3mm = kg3mm > 0 ? Math.ceil(kg3mm / 15) : 0;
-        const bags4mm = kg4mm > 0 ? Math.ceil(kg4mm / 15) : 0;
-        const bags6mm = kg6mm > 0 ? Math.ceil(kg6mm / 15) : 0;
-        const bags9mm = kg9mm > 0 ? Math.ceil(kg9mm / 15) : 0;
-
-        const totalBags = bags2mm + bags3mm + bags4mm + bags6mm + bags9mm;
-
-        // Cost Calculation
-        const cost2mm = bags2mm * SKRETTING_PRICES.size2mm;
-        const cost3mm = bags3mm * SKRETTING_PRICES.size3mm;
-        const cost4mm = bags4mm * SKRETTING_PRICES.size4mm;
-        const cost6mm = bags6mm * SKRETTING_PRICES.size6mm;
-        const cost9mm = bags9mm * SKRETTING_PRICES.size9mm;
-
-        const totalCost = cost2mm + cost3mm + cost4mm + cost6mm + cost9mm;
-
-        // 3. Cycle Duration Estimator (Clarias growth curve approximation)
-        // Average daily growth rate (SGR) ~ 1.5% to 2.5% daily weight increase
-        const totalGainG = targetWeight - initialWeight;
-        // Approx average daily gain in grams (increases as fish grow, avg ~ 5.5g/day to reach 1kg in ~5 months)
-        let estDays = 0;
-        if (targetWeight <= 100) estDays = totalGainG / 1.5;
-        else if (targetWeight <= 500) estDays = 40 + (targetWeight - 100) / 4.5;
-        else estDays = 120 + (targetWeight - 500) / 7.0;
-
-        estDays = Math.round(estDays);
-        const estMonths = (estDays / 30).toFixed(1);
+        // Days calculation
+        const startDay = startStageIdx > 0 ? GROWTH_STAGES[startStageIdx - 1].daysEnd : 0;
+        const totalDays = targetStageData.daysEnd - startDay;
 
         const harvestDate = new Date();
-        harvestDate.setDate(harvestDate.getDate() + estDays);
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', options);
+        harvestDate.setDate(harvestDate.getDate() + totalDays);
+        const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+        const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', dateOptions);
 
-        // Store active summary state
+        let totalFeedKg = 0;
+        let totalBags = 0;
+        const stageResults = [];
+
+        activeStages.forEach(stage => {
+            const stageKg = (stage.kg1000 / 1000) * numFish * fcrScale;
+            totalFeedKg += stageKg;
+
+            let stageBags = 0;
+            if (stageKg > 0) {
+                stageBags = stageKg >= 15 ? Math.ceil(stageKg / 15) : (stageKg / 15).toFixed(1);
+                if (typeof stageBags === 'number') totalBags += stageBags;
+            }
+
+            stageResults.push({
+                name: stage.name,
+                size: stage.size,
+                kg: stageKg.toFixed(1),
+                bags: stageBags,
+                freq: stage.freq
+            });
+        });
+
+        const totalCost = totalBags * bagPrice;
+
         currentSummary = {
             numFish,
-            pondType,
-            initialWeight,
-            targetWeight,
+            totalDays,
+            formattedHarvestDate,
             totalFeedKg: totalFeedKg.toFixed(1),
             totalBags,
-            estDays,
-            estMonths,
-            formattedHarvestDate,
-            kg2mm: kg2mm.toFixed(1), bags2mm, cost2mm,
-            kg3mm: kg3mm.toFixed(1), bags3mm, cost3mm,
-            kg4mm: kg4mm.toFixed(1), bags4mm, cost4mm,
-            kg6mm: kg6mm.toFixed(1), bags6mm, cost6mm,
-            kg9mm: kg9mm.toFixed(1), bags9mm, cost9mm,
-            totalCost
+            totalCost,
+            stageResults
         };
 
-        // Render UI values
-        document.getElementById('resDuration').innerText = `${estDays} Days (~${estMonths} mos)`;
+        // Render UI Data
+        document.getElementById('resDuration').innerText = `${totalDays} Days (~${(totalDays / 30).toFixed(1)} mos)`;
         document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
         document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
         document.getElementById('resBags').innerText = `${totalBags} Bags (15kg)`;
 
-        document.getElementById('resFeed2mm').innerText = `${kg2mm.toFixed(1)} KG (${bags2mm} bags)`;
-        document.getElementById('resFeed3mm').innerText = `${kg3mm.toFixed(1)} KG (${bags3mm} bags)`;
-        document.getElementById('resFeed4mm').innerText = `${kg4mm.toFixed(1)} KG (${bags4mm} bags)`;
-        document.getElementById('resFeed6mm').innerText = `${kg6mm.toFixed(1)} KG (${bags6mm} bags)`;
-        document.getElementById('resFeed9mm').innerText = `${kg9mm.toFixed(1)} KG (${bags9mm} bags)`;
+        const stageListEl = document.getElementById('stageList');
+        stageListEl.innerHTML = '';
+        stageResults.forEach(item => {
+            const li = document.createElement('li');
+            const bagText = typeof item.bags === 'number' && item.bags > 0 ? `(~${item.bags} bags)` : '';
+            li.innerHTML = `<span>${item.name} (${item.size}):</span> <strong>${item.kg} KG ${bagText}</strong>`;
+            stageListEl.appendChild(li);
+        });
 
-        document.getElementById('cost2mm').innerText = formatCurrency(cost2mm);
-        document.getElementById('cost3mm').innerText = formatCurrency(cost3mm);
-        document.getElementById('cost4mm').innerText = formatCurrency(cost4mm);
-        document.getElementById('cost6mm').innerText = formatCurrency(cost6mm);
-        document.getElementById('cost9mm').innerText = formatCurrency(cost9mm);
         document.getElementById('resTotalCost').innerText = formatCurrency(totalCost);
 
         const summaryCard = document.getElementById('summaryCard');
@@ -547,24 +480,21 @@
             if (!currentSummary) return;
         }
 
-        const text = `*Skretting Fish Production Plan*
+        let stageBreakdownText = '';
+        currentSummary.stageResults.forEach(item => {
+            stageBreakdownText += `- ${item.name} (${item.size}): ${item.kg} KG\n`;
+        });
+
+        const text = `*Skretting Catfish Production Plan*
 ---------------------------
-- Stocking Quantity: ${currentSummary.numFish.toLocaleString()} fish
-- Initial Size: ${currentSummary.initialWeight}g
-- Target Weight: ${currentSummary.targetWeight}g
-- Est. Cycle: ${currentSummary.estDays} Days (~${currentSummary.estMonths} mos)
+- Population: ${currentSummary.numFish.toLocaleString()} fish
+- Est. Duration: ${currentSummary.totalDays} Days
 - Est. Harvest Date: ${currentSummary.formattedHarvestDate}
-- Total Skretting Feed: ${currentSummary.totalFeedKg} KG (${currentSummary.totalBags} x 15kg bags)
+- Total Feed Required: ${currentSummary.totalFeedKg} KG (~${currentSummary.totalBags} bags)
 ---------------------------
-SKRETTING FEED SIZES:
-- 1.5mm/2.0mm: ${currentSummary.kg2mm} KG (${currentSummary.bags2mm} bags)
-- 3.0mm: ${currentSummary.kg3mm} KG (${currentSummary.bags3mm} bags)
-- 4.0mm: ${currentSummary.kg4mm} KG (${currentSummary.bags4mm} bags)
-- 6.0mm: ${currentSummary.kg6mm} KG (${currentSummary.bags6mm} bags)
-- 9.0mm: ${currentSummary.kg9mm} KG (${currentSummary.bags9mm} bags)
----------------------------
-ESTIMATED FEED COST:
-*TOTAL: ${formatCurrency(currentSummary.totalCost)}*`;
+STAGE BREAKDOWN:
+${stageBreakdownText}---------------------------
+*TOTAL FEED INVESTMENT: ${formatCurrency(currentSummary.totalCost)}*`;
 
         const encodedText = encodeURIComponent(text);
         window.location.href = `whatsapp://send?text=${encodedText}`;
@@ -576,4 +506,3 @@ ESTIMATED FEED COST:
 
 </body>
 </html>
-
