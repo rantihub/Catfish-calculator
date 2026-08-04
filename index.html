@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skretting Catfish Production & Feed Planner</title>
+    <title>Skretting Catfish Feed & Production Planner</title>
     <style>
         :root {
             --primary: #006699;
@@ -19,40 +19,43 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            padding: 20px 10px;
+            padding: 16px 8px;
             display: flex;
             justify-content: center;
+            text-rendering: optimizeSpeed;
         }
 
         .container {
-            max-width: 750px;
+            max-width: 800px;
             width: 100%;
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            contain: content;
         }
 
         header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
             border-bottom: 3px solid var(--primary);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
 
         header h1 {
             color: var(--primary);
-            font-size: 1.5rem;
+            font-size: 1.4rem;
         }
 
         header p {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             color: #4a5568;
             margin-top: 4px;
         }
@@ -60,7 +63,7 @@
         .form-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 14px;
         }
 
         @media (min-width: 550px) {
@@ -74,7 +77,7 @@
                 grid-column: span 2;
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
-                gap: 12px;
+                gap: 10px;
             }
         }
 
@@ -85,20 +88,20 @@
 
         label {
             font-weight: 600;
-            margin-bottom: 6px;
-            font-size: 0.88rem;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
             color: #2d3748;
         }
 
         input, select {
             width: 100%;
-            padding: 10px 12px;
+            padding: 9px 11px;
             border: 1px solid var(--border);
             border-radius: 6px;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             outline: none;
             background: #fff;
-            transition: border-color 0.2s;
+            transition: border-color 0.15s ease-in-out;
         }
 
         input:focus, select:focus {
@@ -106,23 +109,23 @@
         }
 
         .calc-display-box {
-            background: #eeb20015;
+            background: rgba(238, 178, 0, 0.08);
             border: 1px solid #cbd5e0;
             border-radius: 8px;
-            padding: 12px;
-            margin-top: 4px;
+            padding: 10px;
+            margin-top: 2px;
         }
 
         .calc-display-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            font-size: 0.85rem;
+            gap: 8px;
+            font-size: 0.82rem;
         }
 
         .calc-item {
             background: #fff;
-            padding: 8px;
+            padding: 6px 8px;
             border-radius: 4px;
             border: 1px solid #e2e8f0;
         }
@@ -130,18 +133,18 @@
         .calc-item span {
             display: block;
             color: #718096;
-            font-size: 0.72rem;
+            font-size: 0.70rem;
             text-transform: uppercase;
         }
 
         .calc-item strong {
             color: var(--primary-dark);
-            font-size: 0.95rem;
+            font-size: 0.90rem;
         }
 
         .btn-group {
-            margin-top: 24px;
-            margin-bottom: 24px;
+            margin-top: 20px;
+            margin-bottom: 20px;
         }
 
         button {
@@ -152,11 +155,11 @@
             font-size: 0.95rem;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.2s;
+            touch-action: manipulation;
         }
 
-        button:hover {
-            opacity: 0.9;
+        button:active {
+            opacity: 0.85;
         }
 
         .btn-calc {
@@ -167,11 +170,11 @@
         .btn-whatsapp {
             background-color: var(--accent);
             color: white;
-            display: none; /* Hidden by default until summary is generated */
+            display: none;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 20px;
+            margin-top: 16px;
         }
 
         .summary-card {
@@ -179,19 +182,13 @@
             background: #f7fafc;
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 20px;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            padding: 18px;
         }
 
         .summary-card h2 {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             color: var(--primary-dark);
-            margin-bottom: 14px;
+            margin-bottom: 12px;
             border-bottom: 1px dashed var(--border);
             padding-bottom: 6px;
         }
@@ -199,37 +196,68 @@
         .metric-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 14px;
         }
 
         .metric {
             background: white;
-            padding: 12px;
+            padding: 10px;
             border-radius: 6px;
             border: 1px solid var(--border);
         }
 
         .metric-title {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #718096;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
         }
 
         .metric-value {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
             color: var(--primary);
             margin-top: 2px;
         }
 
         .breakdown-title {
-            font-size: 0.9rem;
+            font-size: 0.90rem;
             font-weight: 600;
             margin-bottom: 8px;
             margin-top: 16px;
             color: var(--primary-dark);
+        }
+
+        /* Detailed Schedule Table */
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 14px;
+        }
+
+        table.schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.80rem;
+            background: #fff;
+        }
+
+        table.schedule-table th, table.schedule-table td {
+            border: 1px solid var(--border);
+            padding: 7px 8px;
+            text-align: left;
+        }
+
+        table.schedule-table th {
+            background-color: var(--primary);
+            color: white;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        table.schedule-table tr:nth-child(even) {
+            background-color: #f8fafc;
         }
 
         .breakdown-list {
@@ -239,8 +267,8 @@
         .breakdown-list li {
             display: flex;
             justify-content: space-between;
-            font-size: 0.88rem;
-            padding: 7px 0;
+            font-size: 0.85rem;
+            padding: 6px 0;
             border-bottom: 1px solid #edf2f7;
         }
 
@@ -250,16 +278,16 @@
 
         .breakdown-list li.total-row {
             border-top: 2px solid var(--primary);
-            padding-top: 10px;
+            padding-top: 8px;
             margin-top: 4px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             color: var(--primary-dark);
         }
 
         .density-warning {
             padding: 10px 12px;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             margin-bottom: 12px;
             display: none;
         }
@@ -268,11 +296,11 @@
         .density-high { background: #fffaf0; color: #7b341e; border: 1px solid #feebc8; }
 
         .note {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #718096;
-            margin-top: 14px;
+            margin-top: 12px;
             font-style: italic;
-            line-height: 1.4;
+            line-height: 1.35;
         }
     </style>
 </head>
@@ -281,11 +309,15 @@
 <div class="container">
     <header>
         <h1>Skretting Catfish Feed & Production Planner</h1>
-        <p>Precision Feed Planning & Dynamic Cost Estimator</p>
+        <p>Precision Feed Schedule, Sorting Timelines & Cost Estimator</p>
     </header>
 
     <div class="form-grid">
-        <!-- Pond Dimensions Input -->
+        <div class="form-group full-width">
+            <label for="stockingDate">Desired Date of Stocking</label>
+            <input type="date" id="stockingDate">
+        </div>
+
         <div class="form-group three-col">
             <div class="form-group">
                 <label for="pondLength">Length (ft)</label>
@@ -301,7 +333,6 @@
             </div>
         </div>
 
-        <!-- Calculated Measurements Display -->
         <div class="form-group full-width">
             <div class="calc-display-box">
                 <div class="calc-display-grid">
@@ -354,7 +385,7 @@
             </select>
         </div>
 
-        <div class="form-group full-width">
+        <div class="form-group">
             <label for="targetFcr">Applied FCR Adjustment</label>
             <input type="number" id="targetFcr" value="1.10" min="0.5" max="2.5" step="0.01">
         </div>
@@ -371,7 +402,7 @@
 
         <div class="metric-grid">
             <div class="metric">
-                <div class="metric-title">Est. Harvest Date</div>
+                <div class="metric-title">Rec. Harvest Date</div>
                 <div class="metric-value" id="resHarvestDate">-</div>
             </div>
             <div class="metric">
@@ -392,27 +423,44 @@
             </div>
         </div>
 
-        <div class="breakdown-title">Feed Breakdown by Pellet Size &amp; Quantity</div>
-        <ul class="breakdown-list" id="stageList">
-            <!-- Dynamic Feed Stages Rendered Here -->
-        </ul>
+        <!-- Prescribed Feeding & Stage Schedule Table -->
+        <div class="breakdown-title">Prescribed Feeding Schedule & Weight Progression</div>
+        <div class="table-wrapper">
+            <table class="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Stage & Feed Size</th>
+                        <th>Target Weight Range</th>
+                        <th>Date Range & Duration</th>
+                        <th>Daily Feeding Frequency</th>
+                        <th>Feed Qty (Kg / Bags)</th>
+                    </tr>
+                </thead>
+                <tbody id="scheduleTableBody"></tbody>
+            </table>
+        </div>
 
+        <!-- Recommended Sorting Timelines -->
+        <div class="breakdown-title">Recommended Sorting & Sampling Schedule</div>
+        <ul class="breakdown-list" id="sortingList"></ul>
+
+        <!-- Feed Value Calculation Breakdown -->
         <div class="breakdown-title">Feed Value Calculation Breakdown</div>
-        <ul class="breakdown-list" id="costList">
-            <!-- Dynamic Costs & Valuation Calculations Rendered Here -->
-        </ul>
+        <ul class="breakdown-list" id="costList"></ul>
 
         <div class="note">
-            * Packaging Rules: 0.1mm-0.3mm (1kg bag), 0.5mm to 1.8mm (5kg bag), 2mm up to 8mm (15kg bag). Figures configured to match FCR 1.1 reference chart.
+            * Packaging Rules: 0.1mm-0.3mm (1kg bag), 0.5mm to 1.8mm (5kg bag), 2mm up to 8mm (15kg bag). Feeding schedule and frequencies directly aligned with the growth reference chart.
         </div>
     </div>
 
-    <!-- WhatsApp Share Button moved to bottom -->
     <button class="btn-whatsapp" id="btnWhatsApp">Share Summary via WhatsApp</button>
 </div>
 
 <script>
-    // Feed Configuration & Specific Bag Weights (15kg for 2mm through 8mm)
+    const dateInput = document.getElementById('stockingDate');
+    const today = new Date();
+    dateInput.value = today.toISOString().split('T')[0];
+
     const FEED_CONFIG = {
         "Perla Larva 0.1-0.3mm": { price: 14000, bagSize: 1 },
         "0.5mm - 0.7mm": { price: 57450, bagSize: 5 },
@@ -427,48 +475,52 @@
         "8mm": { price: 19650, bagSize: 15 }
     };
 
-    // Stage Feed Rules based directly on Chart Reference for 1,000 Fish Baseline (FCR = 1.1)
+    // Full Prescribed Data from Reference Chart
     const STAGE_RULES = [
-        { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, kgPer1000: 0.5 },
-        { id: 1, name: "Fry Size", feedKey: "0.5mm - 0.7mm", startG: 0.05, endG: 1.0, kgPer1000: 0.5 },
-        { id: 2, name: "Pre-Fingerlings", feedKey: "1mm", startG: 1.0, endG: 2.0, kgPer1000: 1.5 },
-        { id: 3, name: "Fingerlings Size", feedKey: "1.2mm", startG: 2.0, endG: 4.0, kgPer1000: 2.0 },
-        { id: 4, name: "Post Fingerlings", feedKey: "1.5mm", startG: 4.0, endG: 6.0, kgPer1000: 2.0 },
-        { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, kgPer1000: 5.0 },
-        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, kgPer1000: 60.0 },      // 4 bags @ 15kg
-        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, kgPer1000: 180.0 },       // 12 bags @ 15kg
-        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, kgPer1000: 360.0 },    // 24 bags @ 15kg
-        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, kgPer1000: 495.0 },     // 33 bags @ 15kg
-        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, kgPer1000: 570.0 }     // 38 bags @ 15kg
+        { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
+        { id: 1, name: "Fry Size", feedKey: "0.5mm - 0.7mm", startG: 0.05, endG: 1.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
+        { id: 2, name: "Pre-Fingerlings", feedKey: "1mm", startG: 1.0, endG: 2.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 1.5 },
+        { id: 3, name: "Fingerlings Size", feedKey: "1.2mm", startG: 2.0, endG: 4.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
+        { id: 4, name: "Post Fingerlings", feedKey: "1.5mm", startG: 4.0, endG: 6.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
+        { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, days: 7, freq: "2 – 3 times daily", kgPer1000: 5.0 },
+        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, days: 30, freq: "2 – 3 times daily", kgPer1000: 60.0 },
+        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, days: 30, freq: "2 times daily", kgPer1000: 180.0 },
+        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, days: 32, freq: "2 times daily", kgPer1000: 360.0 },
+        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "2 times daily", kgPer1000: 495.0 },
+        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 – 2 times daily", kgPer1000: 570.0 }
     ];
 
     let currentSummary = null;
+    const currencyFormatter = new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 0 });
 
-    function formatCurrency(amount) {
-        return '₦' + Math.round(amount).toLocaleString('en-NG');
+    function formatWeight(g) {
+        return g >= 1000 ? `${(g / 1000).toFixed(1)} kg` : `${g} g`;
+    }
+
+    function formatDateShort(dateObj) {
+        return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
     function updatePondDimensions() {
-        const lengthFt = parseFloat(document.getElementById('pondLength').value) || 0;
-        const widthFt = parseFloat(document.getElementById('pondWidth').value) || 0;
-        const depthFt = parseFloat(document.getElementById('pondDepth').value) || 0;
+        const l = parseFloat(document.getElementById('pondLength').value) || 0;
+        const w = parseFloat(document.getElementById('pondWidth').value) || 0;
+        const d = parseFloat(document.getElementById('pondDepth').value) || 0;
 
-        const areaFt = lengthFt * widthFt;
+        const areaFt = l * w;
         const areaM = areaFt / 10.7639;
-
-        const volFt = areaFt * depthFt;
+        const volFt = areaFt * d;
         const volM = volFt / 35.3147;
 
-        document.getElementById('dispAreaFt').innerText = `${areaFt.toFixed(1)} ft²`;
-        document.getElementById('dispAreaM').innerText = `${areaM.toFixed(2)} m²`;
-        document.getElementById('dispVolFt').innerText = `${volFt.toFixed(1)} ft³`;
-        document.getElementById('dispVolM').innerText = `${volM.toFixed(2)} m³`;
+        document.getElementById('dispAreaFt').textContent = areaFt.toFixed(1) + ' ft²';
+        document.getElementById('dispAreaM').textContent = areaM.toFixed(2) + ' m²';
+        document.getElementById('dispVolFt').textContent = volFt.toFixed(1) + ' ft³';
+        document.getElementById('dispVolM').textContent = volM.toFixed(2) + ' m³';
 
-        return { areaFt, areaM, volFt, volM };
+        return { areaFt, areaM, volM };
     }
 
     ['pondLength', 'pondWidth', 'pondDepth'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updatePondDimensions);
+        document.getElementById(id).addEventListener('input', updatePondDimensions, { passive: true });
     });
 
     function calculateSummary() {
@@ -476,6 +528,7 @@
         const startStageIdx = parseInt(document.getElementById('stockingStage').value);
         const targetHarvestG = parseFloat(document.getElementById('targetHarvestWeight').value);
         const userFcr = parseFloat(document.getElementById('targetFcr').value) || 1.1;
+        const selectedDateVal = document.getElementById('stockingDate').value;
 
         const dims = updatePondDimensions();
 
@@ -492,7 +545,7 @@
 
         const fcrScale = userFcr / 1.1;
 
-        // Stocking density check
+        // Stocking density assessment
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
@@ -503,57 +556,82 @@
             const actualDensity = numFish / dims.volM;
             if (actualDensity > recDensityPerM3) {
                 densityNotice.className = 'density-warning density-high';
-                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Recommended max: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
+                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Max recommended: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
             } else {
                 densityNotice.className = 'density-warning density-ok';
-                densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Recommended max: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
+                densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Max recommended: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
             }
         } else {
             densityNotice.style.display = 'none';
         }
 
-        // Calculate feed quantities
-        const feedMap = {};
+        // Processing Feeding Timeline and Stage Details
         let totalFeedKg = 0;
         let totalEstDays = 0;
 
-        STAGE_RULES.forEach(stage => {
-            if (stage.id < startStageIdx) return;
-            if (stage.startG >= targetHarvestG) return;
+        const stockDateObj = selectedDateVal ? new Date(selectedDateVal) : new Date();
+        let runningDate = new Date(stockDateObj.valueOf());
+
+        const scheduleRows = [];
+        const sortingEvents = [];
+        const feedMap = {};
+
+        for (let i = startStageIdx; i < STAGE_RULES.length; i++) {
+            const stage = STAGE_RULES[i];
+            if (stage.startG >= targetHarvestG) break;
 
             let stageGainFactor = 1.0;
             if (targetHarvestG < stage.endG) {
                 stageGainFactor = (targetHarvestG - stage.startG) / (stage.endG - stage.startG);
             }
 
+            const stageDays = Math.max(1, Math.round(stage.days * stageGainFactor));
             const stageKg = (stage.kgPer1000 / 1000) * numFish * fcrScale * stageGainFactor;
             totalFeedKg += stageKg;
+            totalEstDays += stageDays;
+
+            const stageStartDate = new Date(runningDate.valueOf());
+            runningDate.setDate(runningDate.getDate() + stageDays);
+            const stageEndDate = new Date(runningDate.valueOf());
 
             const config = FEED_CONFIG[stage.feedKey];
-
             if (!feedMap[stage.feedKey]) {
-                feedMap[stage.feedKey] = { 
-                    kg: 0, 
-                    bagSize: config.bagSize, 
-                    price: config.price 
-                };
+                feedMap[stage.feedKey] = { kg: 0, bagSize: config.bagSize, price: config.price };
             }
             feedMap[stage.feedKey].kg += stageKg;
 
-            const stageDays = (stage.endG - stage.startG) * 0.18 * stageGainFactor;
-            totalEstDays += stageDays;
-        });
+            const bags = stageKg / config.bagSize;
+            const fullBagsCount = Math.ceil(bags);
 
-        totalEstDays = Math.max(30, Math.round(totalEstDays));
+            scheduleRows.push({
+                stageName: stage.name,
+                feedKey: stage.feedKey,
+                startWeight: formatWeight(stage.startG),
+                endWeight: formatWeight(targetHarvestG < stage.endG ? targetHarvestG : stage.endG),
+                startDateStr: formatDateShort(stageStartDate),
+                endDateStr: formatDateShort(stageEndDate),
+                days: stageDays,
+                freq: stage.freq,
+                kg: stageKg.toFixed(1),
+                bags: fullBagsCount,
+                bagSize: config.bagSize
+            });
 
-        const harvestDate = new Date();
-        harvestDate.setDate(harvestDate.getDate() + totalEstDays);
+            // Sorting Recommendation Rules
+            if (stage.id <= 5) {
+                sortingEvents.push(`<strong>${stage.name} Stage (${formatDateShort(stageStartDate)}):</strong> Conduct weekly sorting & sampling. Separate shooters/fast growers.`);
+            } else if (stage.id === 6 || stage.id === 7) {
+                sortingEvents.push(`<strong>${stage.name} Stage (${formatDateShort(stageStartDate)}):</strong> Bi-weekly sorting & biomass check to re-adjust daily feeding rates.`);
+            }
+        }
+
+        const harvestDateObj = new Date(runningDate.valueOf());
         const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-        const formattedHarvestDate = harvestDate.toLocaleDateString('en-US', dateOptions);
+        const formattedStockDate = stockDateObj.toLocaleDateString('en-US', dateOptions);
+        const formattedHarvestDate = harvestDateObj.toLocaleDateString('en-US', dateOptions);
 
         let totalCost = 0;
         let totalBagsCount = 0;
-        const stageResults = [];
         const costResults = [];
 
         Object.keys(feedMap).forEach(feedKey => {
@@ -564,13 +642,6 @@
 
             totalCost += cost;
             totalBagsCount += fullBagsCount;
-
-            stageResults.push({
-                feedKey,
-                kg: data.kg.toFixed(1),
-                bags: fullBagsCount,
-                bagSize: data.bagSize
-            });
 
             costResults.push({
                 feedKey,
@@ -585,54 +656,60 @@
             numFish,
             targetHarvestG,
             totalEstDays,
+            formattedStockDate,
             formattedHarvestDate,
             totalFeedKg: totalFeedKg.toFixed(1),
             totalBagsCount,
             totalCost,
-            stageResults,
+            scheduleRows,
+            sortingEvents,
             costResults,
             areaFt: dims.areaFt.toFixed(1),
             areaM: dims.areaM.toFixed(2),
             recommendedStockCount
         };
 
-        // Render UI metrics
-        document.getElementById('resHarvestDate').innerText = formattedHarvestDate;
-        document.getElementById('resTotalFeed').innerText = `${totalFeedKg.toFixed(1)} KG`;
-        document.getElementById('resTotalBags').innerText = `${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}`;
-        document.getElementById('resTargetWeight').innerText = targetHarvestG >= 1000 ? `${(targetHarvestG / 1000).toFixed(1)} KG` : `${targetHarvestG} Grams`;
-        document.getElementById('resDuration').innerText = `~${totalEstDays} Days (${(totalEstDays / 30).toFixed(1)} mos)`;
+        // Render Summary Metrics
+        document.getElementById('resHarvestDate').textContent = formattedHarvestDate;
+        document.getElementById('resTotalFeed').textContent = `${totalFeedKg.toFixed(1)} KG`;
+        document.getElementById('resTotalBags').textContent = `${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}`;
+        document.getElementById('resTargetWeight').textContent = targetHarvestG >= 1000 ? `${(targetHarvestG / 1000).toFixed(1)} KG` : `${targetHarvestG} Grams`;
+        document.getElementById('resDuration').textContent = `~${totalEstDays} Days (${(totalEstDays / 30).toFixed(1)} mos)`;
 
-        const stageListEl = document.getElementById('stageList');
-        stageListEl.innerHTML = '';
-        stageResults.forEach(item => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey}:</span> <strong>${item.kg} KG (${item.bags} bag${item.bags > 1 ? 's' : ''} of ${item.bagSize}kg)</strong>`;
-            stageListEl.appendChild(li);
+        // Render Schedule Table
+        const tableBody = document.getElementById('scheduleTableBody');
+        let tableHTML = '';
+        scheduleRows.forEach(row => {
+            tableHTML += `<tr>
+                <td><strong>${row.stageName}</strong><br><small style="color:#718096;">${row.feedKey}</small></td>
+                <td>${row.startWeight} → ${row.endWeight}</td>
+                <td>${row.startDateStr} – ${row.endDateStr}<br><small style="color:#718096;">(${row.days} days)</small></td>
+                <td>${row.freq}</td>
+                <td><strong>${row.kg} kg</strong> (${row.bags} bag${row.bags > 1 ? 's' : ''})</td>
+            </tr>`;
         });
+        tableBody.innerHTML = tableHTML;
 
-        const totalBagsLi = document.createElement('li');
-        totalBagsLi.className = 'total-row';
-        totalBagsLi.innerHTML = `<span>Total Bags Required:</span> <strong>${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}</strong>`;
-        stageListEl.appendChild(totalBagsLi);
+        // Render Sorting Schedule
+        const sortingListEl = document.getElementById('sortingList');
+        let sortingHTML = '';
+        sortingEvents.forEach(evt => {
+            sortingHTML += `<li><span>${evt}</span></li>`;
+        });
+        sortingListEl.innerHTML = sortingHTML;
 
+        // Render Cost Breakdown
         const costListEl = document.getElementById('costList');
-        costListEl.innerHTML = '';
+        let costHTML = '';
         costResults.forEach(item => {
-            const li = document.createElement('li');
-            li.innerHTML = `<span>${item.feedKey} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${formatCurrency(item.unitPrice)}):</span> <strong>${formatCurrency(item.totalCost)}</strong>`;
-            costListEl.appendChild(li);
+            costHTML += `<li><span>${item.feedKey} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
         });
-
-        const totalLi = document.createElement('li');
-        totalLi.className = 'total-row';
-        totalLi.innerHTML = `<span>Total Feed Value:</span> <strong>${formatCurrency(totalCost)}</strong>`;
-        costListEl.appendChild(totalLi);
+        costHTML += `<li class="total-row"><span>Total Feed Value:</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
+        costListEl.innerHTML = costHTML;
 
         const summaryCard = document.getElementById('summaryCard');
         summaryCard.style.display = 'block';
         
-        // Show the WhatsApp button at the bottom
         const btnWhatsApp = document.getElementById('btnWhatsApp');
         btnWhatsApp.style.display = 'flex';
 
@@ -646,39 +723,35 @@
         }
 
         let stageText = '';
-        currentSummary.stageResults.forEach(item => {
-            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
-            stageText += `- ${item.feedKey}: ${item.kg} KG (${item.bags} ${bagLabel} of ${item.bagSize}kg)\n`;
+        currentSummary.scheduleRows.forEach(row => {
+            stageText += `- ${row.stageName} (${row.feedKey}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
         });
 
         let costBreakdownText = '';
         currentSummary.costResults.forEach(item => {
-            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
-            costBreakdownText += `- ${item.feedKey}: ${item.bags} ${bagLabel} @ ${formatCurrency(item.unitPrice)} = ${formatCurrency(item.totalCost)}\n`;
+            costBreakdownText += `- ${item.feedKey}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
-        const totalBagsLabel = currentSummary.totalBagsCount > 1 ? 'bags' : 'bag';
 
         const text = `*Skretting Catfish Production Plan*
 ---------------------------
-- Pond Dimensions: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
+- Stocking Date: ${currentSummary.formattedStockDate}
+- Rec. Harvest Date: ${currentSummary.formattedHarvestDate}
+- Pond Area: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
 - Rec. Max Stocking: ~${currentSummary.recommendedStockCount.toLocaleString()} fish
-- Stocking Population: ${currentSummary.numFish.toLocaleString()} fish
-- Target Harvest Weight: ${targetLabel}
-- Est. Cycle Duration: ~${currentSummary.totalEstDays} Days
-- Target Harvest Date: ${currentSummary.formattedHarvestDate}
-- Total Feed Required: ${currentSummary.totalFeedKg} KG
-- Total Bags Required: ${currentSummary.totalBagsCount} ${totalBagsLabel}
+- Population: ${currentSummary.numFish.toLocaleString()} fish
+- Target Weight: ${targetLabel}
+- Est. Duration: ~${currentSummary.totalEstDays} Days
+- Total Feed: ${currentSummary.totalFeedKg} KG (${currentSummary.totalBagsCount} bags)
 ---------------------------
-FEED REQUIREMENT BREAKDOWN:
+PRESCRIBED FEEDING & PROGRESSION:
 ${stageText}---------------------------
-FEED VALUE CALCULATION BREAKDOWN:
+COST BREAKDOWN:
 ${costBreakdownText}---------------------------
-*TOTAL FEED VALUE: ${formatCurrency(currentSummary.totalCost)}*`;
+*TOTAL FEED VALUE: ${currencyFormatter.format(currentSummary.totalCost)}*`;
 
-        const encodedText = encodeURIComponent(text);
-        window.location.href = `whatsapp://send?text=${encodedText}`;
+        window.location.href = `whatsapp://send?text=${encodeURIComponent(text)}`;
     }
 
     updatePondDimensions();
