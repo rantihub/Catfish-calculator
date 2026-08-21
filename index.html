@@ -229,7 +229,6 @@
             color: var(--primary-dark);
         }
 
-        /* Detailed Schedule Table */
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
@@ -378,9 +377,11 @@
             <label for="targetHarvestWeight">Target Harvest Size</label>
             <select id="targetHarvestWeight">
                 <option value="200">200 gm (Jumbo Size)</option>
+                <option value="300">300 gm (Medium / Pre-Smoked)</option>
                 <option value="550">550 gm (Smokeable / Medium)</option>
                 <option value="800">800 gm (Melange / Large)</option>
                 <option value="1000" selected>1 kg (Table Size)</option>
+                <option value="1500">1.5 kg (Large Table Size)</option>
                 <option value="2000">2 kg (Adult Size)</option>
             </select>
         </div>
@@ -423,7 +424,6 @@
             </div>
         </div>
 
-        <!-- Prescribed Feeding & Stage Schedule Table -->
         <div class="breakdown-title">Prescribed Feeding Schedule & Weight Progression</div>
         <div class="table-wrapper">
             <table class="schedule-table">
@@ -440,11 +440,9 @@
             </table>
         </div>
 
-        <!-- Recommended Sorting Timelines -->
         <div class="breakdown-title">Recommended Sorting & Sampling Schedule</div>
         <ul class="breakdown-list" id="sortingList"></ul>
 
-        <!-- Feed Value Calculation Breakdown -->
         <div class="breakdown-title">Feed Value Calculation Breakdown</div>
         <ul class="breakdown-list" id="costList"></ul>
 
@@ -475,7 +473,7 @@
         "8mm": { price: 19650, bagSize: 15 }
     };
 
-    // Full Prescribed Data from Reference Chart
+    // Adjusted 4mm, 6mm, and 8mm feeding frequencies to "1 time daily"
     const STAGE_RULES = [
         { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
         { id: 1, name: "Fry Size", feedKey: "0.5mm - 0.7mm", startG: 0.05, endG: 1.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
@@ -485,9 +483,9 @@
         { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, days: 7, freq: "2 – 3 times daily", kgPer1000: 5.0 },
         { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, days: 30, freq: "2 – 3 times daily", kgPer1000: 60.0 },
         { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, days: 30, freq: "2 times daily", kgPer1000: 180.0 },
-        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, days: 32, freq: "2 times daily", kgPer1000: 360.0 },
-        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "2 times daily", kgPer1000: 495.0 },
-        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 – 2 times daily", kgPer1000: 570.0 }
+        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, days: 32, freq: "1 time daily", kgPer1000: 360.0 },
+        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "1 time daily", kgPer1000: 495.0 },
+        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 time daily", kgPer1000: 570.0 }
     ];
 
     let currentSummary = null;
@@ -545,7 +543,6 @@
 
         const fcrScale = userFcr / 1.1;
 
-        // Stocking density assessment
         const densityNotice = document.getElementById('densityNotice');
         densityNotice.style.display = 'block';
 
@@ -565,7 +562,6 @@
             densityNotice.style.display = 'none';
         }
 
-        // Processing Feeding Timeline and Stage Details
         let totalFeedKg = 0;
         let totalEstDays = 0;
 
@@ -617,7 +613,6 @@
                 bagSize: config.bagSize
             });
 
-            // Sorting Recommendation Rules
             if (stage.id <= 5) {
                 sortingEvents.push(`<strong>${stage.name} Stage (${formatDateShort(stageStartDate)}):</strong> Conduct weekly sorting & sampling. Separate shooters/fast growers.`);
             } else if (stage.id === 6 || stage.id === 7) {
@@ -669,14 +664,12 @@
             recommendedStockCount
         };
 
-        // Render Summary Metrics
         document.getElementById('resHarvestDate').textContent = formattedHarvestDate;
         document.getElementById('resTotalFeed').textContent = `${totalFeedKg.toFixed(1)} KG`;
         document.getElementById('resTotalBags').textContent = `${totalBagsCount} Bag${totalBagsCount !== 1 ? 's' : ''}`;
         document.getElementById('resTargetWeight').textContent = targetHarvestG >= 1000 ? `${(targetHarvestG / 1000).toFixed(1)} KG` : `${targetHarvestG} Grams`;
         document.getElementById('resDuration').textContent = `~${totalEstDays} Days (${(totalEstDays / 30).toFixed(1)} mos)`;
 
-        // Render Schedule Table
         const tableBody = document.getElementById('scheduleTableBody');
         let tableHTML = '';
         scheduleRows.forEach(row => {
@@ -690,7 +683,6 @@
         });
         tableBody.innerHTML = tableHTML;
 
-        // Render Sorting Schedule
         const sortingListEl = document.getElementById('sortingList');
         let sortingHTML = '';
         sortingEvents.forEach(evt => {
@@ -698,7 +690,6 @@
         });
         sortingListEl.innerHTML = sortingHTML;
 
-        // Render Cost Breakdown
         const costListEl = document.getElementById('costList');
         let costHTML = '';
         costResults.forEach(item => {
