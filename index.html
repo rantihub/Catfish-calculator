@@ -301,6 +301,10 @@
             font-style: italic;
             line-height: 1.35;
         }
+
+        #customHarvestGroup {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -365,9 +369,9 @@
             <select id="stockingStage">
                 <option value="0">Early Fry (0.1mm - 0.3mm)</option>
                 <option value="1">Fry (0.5mm - 0.7mm)</option>
-                <option value="2">Pre-Fingerlings (1mm / 1g)</option>
-                <option value="3" selected>Fingerlings (1.2mm / 2g)</option>
-                <option value="4">Post Fingerlings (1.5mm / 4g)</option>
+                <option value="2">Pre-Fingerlings (1.1mm / 1g)</option>
+                <option value="3" selected>Fingerlings (1.8mm / 2g)</option>
+                <option value="4">Post Fingerlings (1.8mm / 4g)</option>
                 <option value="5">Juveniles (1.8mm / 6g)</option>
                 <option value="6">Post Juveniles (2mm / 10g)</option>
             </select>
@@ -383,6 +387,20 @@
                 <option value="1000" selected>1 kg (Table Size)</option>
                 <option value="1500">1.5 kg (Large Table Size)</option>
                 <option value="2000">2 kg (Adult Size)</option>
+                <option value="custom">Others (Custom Size in Grams)</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="customHarvestGroup">
+            <label for="customHarvestGrams">Enter Custom Harvest Target (Grams)</label>
+            <input type="number" id="customHarvestGrams" placeholder="e.g. 1200" min="1">
+        </div>
+
+        <div class="form-group">
+            <label for="feedQuality">Pellet Quality Choice (3mm to 8mm)</label>
+            <select id="feedQuality">
+                <option value="Superior" selected>Superior Line</option>
+                <option value="Essential">Essential Line</option>
             </select>
         </div>
 
@@ -447,7 +465,7 @@
         <ul class="breakdown-list" id="costList"></ul>
 
         <div class="note">
-            * Packaging Rules: 0.1mm-0.3mm (1kg bag), 0.5mm to 1.8mm (5kg bag), 2mm up to 8mm (15kg bag). Feeding schedule and frequencies directly aligned with the growth reference chart.
+            * Packaging Rules: Perla Larva (1kg bag), 0.5mm to 1.8mm Crumbles (5kg bag), 2mm to 8mm Pellets (15kg bag). Feeding schedule and frequencies directly aligned with the growth reference chart.
         </div>
     </div>
 
@@ -459,31 +477,40 @@
     const today = new Date();
     dateInput.value = today.toISOString().split('T')[0];
 
-    const FEED_CONFIG = {
-        "Perla Larva 0.1-0.3mm": { price: 14000, bagSize: 1 },
-        "0.5mm - 0.7mm": { price: 57450, bagSize: 5 },
-        "1mm": { price: 38950, bagSize: 5 },
-        "1.2mm": { price: 23700, bagSize: 5 },
-        "1.5mm": { price: 23700, bagSize: 5 },
-        "1.8mm": { price: 23700, bagSize: 5 },
-        "2mm": { price: 31200, bagSize: 15 },
-        "3mm": { price: 25800, bagSize: 15 },
-        "4mm": { price: 22650, bagSize: 15 },
-        "6mm": { price: 21150, bagSize: 15 },
-        "8mm": { price: 19650, bagSize: 15 }
+    const harvestSelect = document.getElementById('targetHarvestWeight');
+    const customHarvestGroup = document.getElementById('customHarvestGroup');
+
+    harvestSelect.addEventListener('change', () => {
+        if (harvestSelect.value === 'custom') {
+            customHarvestGroup.style.display = 'flex';
+        } else {
+            customHarvestGroup.style.display = 'none';
+        }
+    });
+
+    const FEED_CATALOG = {
+        "Perla Larva": { Superior: { price: 14000, bagSize: 1 }, Essential: { price: 14000, bagSize: 1 } },
+        "0.5mm": { Superior: { price: 57450, bagSize: 5 }, Essential: { price: 57450, bagSize: 5 } },
+        "0.7mm": { Superior: { price: 57450, bagSize: 5 }, Essential: { price: 57450, bagSize: 5 } },
+        "1.1mm": { Superior: { price: 38950, bagSize: 5 }, Essential: { price: 38950, bagSize: 5 } },
+        "1.8mm": { Superior: { price: 23700, bagSize: 5 }, Essential: { price: 23700, bagSize: 5 } },
+        "2mm": { Superior: { price: 31200, bagSize: 15 }, Essential: { price: 31200, bagSize: 15 } },
+        "3mm": { Superior: { price: 25800, bagSize: 15 }, Essential: { price: 24750, bagSize: 15 } },
+        "4.5mm": { Superior: { price: 23700, bagSize: 15 }, Essential: { price: 22650, bagSize: 15 } },
+        "6mm": { Superior: { price: 23700, bagSize: 15 }, Essential: { price: 21150, bagSize: 15 } },
+        "8mm": { Superior: { price: 23700, bagSize: 15 }, Essential: { price: 19650, bagSize: 15 } }
     };
 
-    // Adjusted 4mm, 6mm, and 8mm feeding frequencies to "1 time daily"
     const STAGE_RULES = [
-        { id: 0, name: "Early Fry", feedKey: "Perla Larva 0.1-0.3mm", startG: 0.002, endG: 0.05, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
-        { id: 1, name: "Fry Size", feedKey: "0.5mm - 0.7mm", startG: 0.05, endG: 1.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
-        { id: 2, name: "Pre-Fingerlings", feedKey: "1mm", startG: 1.0, endG: 2.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 1.5 },
-        { id: 3, name: "Fingerlings Size", feedKey: "1.2mm", startG: 2.0, endG: 4.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
-        { id: 4, name: "Post Fingerlings", feedKey: "1.5mm", startG: 4.0, endG: 6.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
+        { id: 0, name: "Early Fry", feedKey: "Perla Larva", startG: 0.002, endG: 0.05, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
+        { id: 1, name: "Fry Size", feedKey: "0.5mm", startG: 0.05, endG: 1.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 0.5 },
+        { id: 2, name: "Pre-Fingerlings", feedKey: "1.1mm", startG: 1.0, endG: 2.0, days: 7, freq: "4 – 5 times daily", kgPer1000: 1.5 },
+        { id: 3, name: "Fingerlings Size", feedKey: "1.8mm", startG: 2.0, endG: 4.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
+        { id: 4, name: "Post Fingerlings", feedKey: "1.8mm", startG: 4.0, endG: 6.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
         { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, days: 7, freq: "2 – 3 times daily", kgPer1000: 5.0 },
         { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, days: 30, freq: "2 – 3 times daily", kgPer1000: 60.0 },
         { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, days: 30, freq: "2 times daily", kgPer1000: 180.0 },
-        { id: 8, name: "Smokeable Size", feedKey: "4mm", startG: 200.0, endG: 550.0, days: 32, freq: "1 time daily", kgPer1000: 360.0 },
+        { id: 8, name: "Smokeable Size", feedKey: "4.5mm", startG: 200.0, endG: 550.0, days: 32, freq: "1 time daily", kgPer1000: 360.0 },
         { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "1 time daily", kgPer1000: 495.0 },
         { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 time daily", kgPer1000: 570.0 }
     ];
@@ -524,7 +551,19 @@
     function calculateSummary() {
         const numFish = parseInt(document.getElementById('numFish').value) || 0;
         const startStageIdx = parseInt(document.getElementById('stockingStage').value);
-        const targetHarvestG = parseFloat(document.getElementById('targetHarvestWeight').value);
+        const qualityChoice = document.getElementById('feedQuality').value;
+
+        let targetHarvestG;
+        if (harvestSelect.value === 'custom') {
+            targetHarvestG = parseFloat(document.getElementById('customHarvestGrams').value);
+            if (!targetHarvestG || targetHarvestG <= 0) {
+                alert('Please enter a valid custom harvest target weight in grams.');
+                return;
+            }
+        } else {
+            targetHarvestG = parseFloat(harvestSelect.value);
+        }
+
         const userFcr = parseFloat(document.getElementById('targetFcr').value) || 1.1;
         const selectedDateVal = document.getElementById('stockingDate').value;
 
@@ -553,7 +592,7 @@
             const actualDensity = numFish / dims.volM;
             if (actualDensity > recDensityPerM3) {
                 densityNotice.className = 'density-warning density-high';
-                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Max recommended: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
+                densityNotice.innerHTML = `<strong>High Stocking Density:</strong> Density is <strong>${actualDensity.toFixed(1)} fish/m³</strong>. Optimum limit for <strong>${targetHarvestG >= 1000 ? (targetHarvestG/1000).toFixed(1)+'kg' : targetHarvestG+'g'} target size</strong> is ~<strong>${recDensityPerM3} fish/m³</strong> (Max recommended: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
             } else {
                 densityNotice.className = 'density-warning density-ok';
                 densityNotice.innerHTML = `<strong>Optimal Stocking Density:</strong> Current density is <strong>${actualDensity.toFixed(1)} fish/m³</strong> (Max recommended: ~<strong>${recommendedStockCount.toLocaleString()} fish</strong>).`;
@@ -590,13 +629,13 @@
             runningDate.setDate(runningDate.getDate() + stageDays);
             const stageEndDate = new Date(runningDate.valueOf());
 
-            const config = FEED_CONFIG[stage.feedKey];
+            const feedInfo = FEED_CATALOG[stage.feedKey][qualityChoice];
             if (!feedMap[stage.feedKey]) {
-                feedMap[stage.feedKey] = { kg: 0, bagSize: config.bagSize, price: config.price };
+                feedMap[stage.feedKey] = { kg: 0, bagSize: feedInfo.bagSize, price: feedInfo.price };
             }
             feedMap[stage.feedKey].kg += stageKg;
 
-            const bags = stageKg / config.bagSize;
+            const bags = stageKg / feedInfo.bagSize;
             const fullBagsCount = Math.ceil(bags);
 
             scheduleRows.push({
@@ -610,7 +649,7 @@
                 freq: stage.freq,
                 kg: stageKg.toFixed(1),
                 bags: fullBagsCount,
-                bagSize: config.bagSize
+                bagSize: feedInfo.bagSize
             });
 
             if (stage.id <= 5) {
@@ -650,6 +689,7 @@
         currentSummary = {
             numFish,
             targetHarvestG,
+            qualityChoice,
             totalEstDays,
             formattedStockDate,
             formattedHarvestDate,
@@ -695,7 +735,7 @@
         costResults.forEach(item => {
             costHTML += `<li><span>${item.feedKey} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
         });
-        costHTML += `<li class="total-row"><span>Total Feed Value:</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
+        costHTML += `<li class="total-row"><span>Total Feed Value (${qualityChoice}):</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
         costListEl.innerHTML = costHTML;
 
         const summaryCard = document.getElementById('summaryCard');
@@ -729,6 +769,7 @@
 ---------------------------
 - Stocking Date: ${currentSummary.formattedStockDate}
 - Rec. Harvest Date: ${currentSummary.formattedHarvestDate}
+- Quality Selected: ${currentSummary.qualityChoice}
 - Pond Area: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
 - Rec. Max Stocking: ~${currentSummary.recommendedStockCount.toLocaleString()} fish
 - Population: ${currentSummary.numFish.toLocaleString()} fish
@@ -740,7 +781,7 @@ PRESCRIBED FEEDING & PROGRESSION:
 ${stageText}---------------------------
 COST BREAKDOWN:
 ${costBreakdownText}---------------------------
-*TOTAL FEED VALUE: ${currencyFormatter.format(currentSummary.totalCost)}*`;
+*TOTAL FEED VALUE (${currentSummary.qualityChoice}): ${currencyFormatter.format(currentSummary.totalCost)}*`;
 
         window.location.href = `whatsapp://send?text=${encodeURIComponent(text)}`;
     }
