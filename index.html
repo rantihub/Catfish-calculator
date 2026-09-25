@@ -79,6 +79,12 @@
                 grid-template-columns: 1fr 1fr 1fr;
                 gap: 10px;
             }
+            .four-col {
+                grid-column: span 2;
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+                gap: 8px;
+            }
         }
 
         .form-group {
@@ -140,6 +146,21 @@
         .calc-item strong {
             color: var(--primary-dark);
             font-size: 0.90rem;
+        }
+
+        .quality-section {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 4px;
+        }
+
+        .quality-section legend {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--primary-dark);
+            padding: 0 6px;
         }
 
         .btn-group {
@@ -396,15 +417,42 @@
             <input type="number" id="customHarvestGrams" placeholder="e.g. 1200" min="1">
         </div>
 
-        <div class="form-group">
-            <label for="feedQuality">Pellet Quality Choice (3mm to 8mm)</label>
-            <select id="feedQuality">
-                <option value="Superior" selected>Superior Line</option>
-                <option value="Essential">Essential Line</option>
-            </select>
-        </div>
+        <!-- Individual Feed Quality Selectors for 3mm, 4.5mm, 6mm, and 8mm -->
+        <fieldset class="form-group full-width quality-section">
+            <legend>Feed Quality Selection by Size</legend>
+            <div class="four-col">
+                <div class="form-group">
+                    <label for="quality_3mm">3mm Quality</label>
+                    <select id="quality_3mm">
+                        <option value="Superior" selected>Superior</option>
+                        <option value="Essential">Essential</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quality_4_5mm">4.5mm Quality</label>
+                    <select id="quality_4_5mm">
+                        <option value="Superior" selected>Superior</option>
+                        <option value="Essential">Essential</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quality_6mm">6mm Quality</label>
+                    <select id="quality_6mm">
+                        <option value="Superior" selected>Superior</option>
+                        <option value="Essential">Essential</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quality_8mm">8mm Quality</label>
+                    <select id="quality_8mm">
+                        <option value="Superior" selected>Superior</option>
+                        <option value="Essential">Essential</option>
+                    </select>
+                </div>
+            </div>
+        </fieldset>
 
-        <div class="form-group">
+        <div class="form-group full-width">
             <label for="targetFcr">Applied FCR Adjustment</label>
             <input type="number" id="targetFcr" value="1.10" min="0.5" max="2.5" step="0.01">
         </div>
@@ -548,10 +596,17 @@
         document.getElementById(id).addEventListener('input', updatePondDimensions, { passive: true });
     });
 
+    function getQualityChoiceForFeed(feedKey) {
+        if (feedKey === '3mm') return document.getElementById('quality_3mm').value;
+        if (feedKey === '4.5mm') return document.getElementById('quality_4_5mm').value;
+        if (feedKey === '6mm') return document.getElementById('quality_6mm').value;
+        if (feedKey === '8mm') return document.getElementById('quality_8mm').value;
+        return 'Superior';
+    }
+
     function calculateSummary() {
         const numFish = parseInt(document.getElementById('numFish').value) || 0;
         const startStageIdx = parseInt(document.getElementById('stockingStage').value);
-        const qualityChoice = document.getElementById('feedQuality').value;
 
         let targetHarvestG;
         if (harvestSelect.value === 'custom') {
@@ -629,9 +684,11 @@
             runningDate.setDate(runningDate.getDate() + stageDays);
             const stageEndDate = new Date(runningDate.valueOf());
 
+            const qualityChoice = getQualityChoiceForFeed(stage.feedKey);
             const feedInfo = FEED_CATALOG[stage.feedKey][qualityChoice];
+
             if (!feedMap[stage.feedKey]) {
-                feedMap[stage.feedKey] = { kg: 0, bagSize: feedInfo.bagSize, price: feedInfo.price };
+                feedMap[stage.feedKey] = { kg: 0, bagSize: feedInfo.bagSize, price: feedInfo.price, quality: qualityChoice };
             }
             feedMap[stage.feedKey].kg += stageKg;
 
@@ -641,6 +698,7 @@
             scheduleRows.push({
                 stageName: stage.name,
                 feedKey: stage.feedKey,
+                quality: qualityChoice,
                 startWeight: formatWeight(stage.startG),
                 endWeight: formatWeight(targetHarvestG < stage.endG ? targetHarvestG : stage.endG),
                 startDateStr: formatDateShort(stageStartDate),
@@ -679,6 +737,7 @@
 
             costResults.push({
                 feedKey,
+                quality: data.quality,
                 bags: fullBagsCount,
                 bagSize: data.bagSize,
                 unitPrice: data.price,
@@ -689,7 +748,6 @@
         currentSummary = {
             numFish,
             targetHarvestG,
-            qualityChoice,
             totalEstDays,
             formattedStockDate,
             formattedHarvestDate,
@@ -713,8 +771,9 @@
         const tableBody = document.getElementById('scheduleTableBody');
         let tableHTML = '';
         scheduleRows.forEach(row => {
+            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(row.feedKey) ? ` (${row.quality})` : '';
             tableHTML += `<tr>
-                <td><strong>${row.stageName}</strong><br><small style="color:#718096;">${row.feedKey}</small></td>
+                <td><strong>${row.stageName}</strong><br><small style="color:#718096;">${row.feedKey}${qualText}</small></td>
                 <td>${row.startWeight} → ${row.endWeight}</td>
                 <td>${row.startDateStr} – ${row.endDateStr}<br><small style="color:#718096;">(${row.days} days)</small></td>
                 <td>${row.freq}</td>
@@ -733,9 +792,10 @@
         const costListEl = document.getElementById('costList');
         let costHTML = '';
         costResults.forEach(item => {
-            costHTML += `<li><span>${item.feedKey} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
+            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(item.feedKey) ? ` [${item.quality}]` : '';
+            costHTML += `<li><span>${item.feedKey}${qualText} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
         });
-        costHTML += `<li class="total-row"><span>Total Feed Value (${qualityChoice}):</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
+        costHTML += `<li class="total-row"><span>Total Feed Value:</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
         costListEl.innerHTML = costHTML;
 
         const summaryCard = document.getElementById('summaryCard');
@@ -755,12 +815,14 @@
 
         let stageText = '';
         currentSummary.scheduleRows.forEach(row => {
-            stageText += `- ${row.stageName} (${row.feedKey}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
+            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(row.feedKey) ? ` (${row.quality})` : '';
+            stageText += `- ${row.stageName} (${row.feedKey}${qualText}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
         });
 
         let costBreakdownText = '';
         currentSummary.costResults.forEach(item => {
-            costBreakdownText += `- ${item.feedKey}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
+            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(item.feedKey) ? ` [${item.quality}]` : '';
+            costBreakdownText += `- ${item.feedKey}${qualText}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
@@ -769,7 +831,6 @@
 ---------------------------
 - Stocking Date: ${currentSummary.formattedStockDate}
 - Rec. Harvest Date: ${currentSummary.formattedHarvestDate}
-- Quality Selected: ${currentSummary.qualityChoice}
 - Pond Area: ${currentSummary.areaFt} ft² (${currentSummary.areaM} m²)
 - Rec. Max Stocking: ~${currentSummary.recommendedStockCount.toLocaleString()} fish
 - Population: ${currentSummary.numFish.toLocaleString()} fish
@@ -781,7 +842,7 @@ PRESCRIBED FEEDING & PROGRESSION:
 ${stageText}---------------------------
 COST BREAKDOWN:
 ${costBreakdownText}---------------------------
-*TOTAL FEED VALUE (${currentSummary.qualityChoice}): ${currencyFormatter.format(currentSummary.totalCost)}*`;
+*TOTAL FEED VALUE: ${currencyFormatter.format(currentSummary.totalCost)}*`;
 
         window.location.href = `whatsapp://send?text=${encodeURIComponent(text)}`;
     }
