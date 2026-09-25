@@ -395,6 +395,10 @@
                 <option value="4">Post Fingerlings (1.8mm / 4g)</option>
                 <option value="5">Juveniles (1.8mm / 6g)</option>
                 <option value="6">Post Juveniles (2mm / 10g)</option>
+                <option value="7">Advanced Post Juveniles (3mm / 100g)</option>
+                <option value="8">Jumbo Size (4.5mm / 200g)</option>
+                <option value="9">Medium Size (4.5mm / 300g)</option>
+                <option value="10">Smokeable Size (6mm / 500g)</option>
             </select>
         </div>
 
@@ -556,11 +560,13 @@
         { id: 3, name: "Fingerlings Size", feedKey: "1.8mm", startG: 2.0, endG: 4.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
         { id: 4, name: "Post Fingerlings", feedKey: "1.8mm", startG: 4.0, endG: 6.0, days: 7, freq: "3 – 4 times daily", kgPer1000: 2.0 },
         { id: 5, name: "Juveniles Size", feedKey: "1.8mm", startG: 6.0, endG: 10.0, days: 7, freq: "2 – 3 times daily", kgPer1000: 5.0 },
-        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, days: 30, freq: "2 – 3 times daily", kgPer1000: 60.0 },
-        { id: 7, name: "Jumbo Size", feedKey: "3mm", startG: 50.0, endG: 200.0, days: 30, freq: "2 times daily", kgPer1000: 180.0 },
-        { id: 8, name: "Smokeable Size", feedKey: "4.5mm", startG: 200.0, endG: 550.0, days: 32, freq: "1 time daily", kgPer1000: 360.0 },
-        { id: 9, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "1 time daily", kgPer1000: 495.0 },
-        { id: 10, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 time daily", kgPer1000: 570.0 }
+        { id: 6, name: "Post Juveniles", feedKey: "2mm", startG: 10.0, endG: 50.0, days: 20, freq: "2 – 3 times daily", kgPer1000: 44.0 },
+        { id: 7, name: "Adv. Post Juveniles", feedKey: "3mm", startG: 50.0, endG: 100.0, days: 10, freq: "2 times daily", kgPer1000: 55.0 },
+        { id: 8, name: "Jumbo Size", feedKey: "4.5mm", startG: 100.0, endG: 200.0, days: 12, freq: "2 times daily", kgPer1000: 110.0 },
+        { id: 9, name: "Medium Size", feedKey: "4.5mm", startG: 200.0, endG: 300.0, days: 10, freq: "1 – 2 times daily", kgPer1000: 110.0 },
+        { id: 10, name: "Smokeable Size", feedKey: "6mm", startG: 300.0, endG: 550.0, days: 20, freq: "1 time daily", kgPer1000: 275.0 },
+        { id: 11, name: "Table Size", feedKey: "6mm", startG: 550.0, endG: 1000.0, days: 30, freq: "1 time daily", kgPer1000: 495.0 },
+        { id: 12, name: "Adult Size", feedKey: "8mm", startG: 1000.0, endG: 2000.0, days: 30, freq: "1 time daily", kgPer1000: 570.0 }
     ];
 
     let currentSummary = null;
@@ -724,7 +730,7 @@
 
             if (stage.id <= 5) {
                 sortingEvents.push(`<strong>${stage.name} Stage (${formatDateShort(stageStartDate)}):</strong> Conduct weekly sorting & sampling. Separate shooters/fast growers.`);
-            } else if (stage.id === 6 || stage.id === 7) {
+            } else if (stage.id >= 6 && stage.id <= 8) {
                 sortingEvents.push(`<strong>${stage.name} Stage (${formatDateShort(stageStartDate)}):</strong> Bi-weekly sorting & biomass check to re-adjust daily feeding rates.`);
             }
         }
