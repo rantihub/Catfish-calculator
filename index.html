@@ -417,36 +417,36 @@
             <input type="number" id="customHarvestGrams" placeholder="e.g. 1200" min="1">
         </div>
 
-        <!-- Individual Feed Quality Selectors for 3mm, 4.5mm, 6mm, and 8mm -->
+        <!-- Individual Feed Quality Selectors -->
         <fieldset class="form-group full-width quality-section">
             <legend>Feed Quality Selection by Size</legend>
             <div class="four-col">
                 <div class="form-group">
                     <label for="quality_3mm">3mm Quality</label>
                     <select id="quality_3mm">
-                        <option value="Superior" selected>Superior</option>
-                        <option value="Essential">Essential</option>
+                        <option value="Superior" selected>Superior (3ms)</option>
+                        <option value="Essential">Essential (3mes)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="quality_4_5mm">4.5mm Quality</label>
                     <select id="quality_4_5mm">
-                        <option value="Superior" selected>Superior</option>
-                        <option value="Essential">Essential</option>
+                        <option value="Superior" selected>Superior (4.5ms)</option>
+                        <option value="Essential">Essential (4.5mes)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="quality_6mm">6mm Quality</label>
                     <select id="quality_6mm">
-                        <option value="Superior" selected>Superior</option>
-                        <option value="Essential">Essential</option>
+                        <option value="Superior" selected>Superior (6ms)</option>
+                        <option value="Essential">Essential (6mes)</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="quality_8mm">8mm Quality</label>
                     <select id="quality_8mm">
-                        <option value="Superior" selected>Superior</option>
-                        <option value="Essential">Essential</option>
+                        <option value="Superior" selected>Superior (8ms)</option>
+                        <option value="Essential">Essential (8mes)</option>
                     </select>
                 </div>
             </div>
@@ -574,6 +574,16 @@
         return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
+    // Returns formatted code: 3mms, 3mmes, 4.5mms, 4.5mmes, etc.
+    function getFeedCode(feedKey, quality) {
+        if (feedKey === '2mm') return '2ms';
+        if (['3mm', '4.5mm', '6mm', '8mm'].includes(feedKey)) {
+            const suffix = (quality === 'Essential') ? 'es' : 's';
+            return feedKey + suffix;
+        }
+        return feedKey;
+    }
+
     function updatePondDimensions() {
         const l = parseFloat(document.getElementById('pondLength').value) || 0;
         const w = parseFloat(document.getElementById('pondWidth').value) || 0;
@@ -686,9 +696,10 @@
 
             const qualityChoice = getQualityChoiceForFeed(stage.feedKey);
             const feedInfo = FEED_CATALOG[stage.feedKey][qualityChoice];
+            const feedCode = getFeedCode(stage.feedKey, qualityChoice);
 
             if (!feedMap[stage.feedKey]) {
-                feedMap[stage.feedKey] = { kg: 0, bagSize: feedInfo.bagSize, price: feedInfo.price, quality: qualityChoice };
+                feedMap[stage.feedKey] = { kg: 0, bagSize: feedInfo.bagSize, price: feedInfo.price, quality: qualityChoice, feedCode };
             }
             feedMap[stage.feedKey].kg += stageKg;
 
@@ -698,6 +709,7 @@
             scheduleRows.push({
                 stageName: stage.name,
                 feedKey: stage.feedKey,
+                feedCode,
                 quality: qualityChoice,
                 startWeight: formatWeight(stage.startG),
                 endWeight: formatWeight(targetHarvestG < stage.endG ? targetHarvestG : stage.endG),
@@ -737,6 +749,7 @@
 
             costResults.push({
                 feedKey,
+                feedCode: data.feedCode,
                 quality: data.quality,
                 bags: fullBagsCount,
                 bagSize: data.bagSize,
@@ -771,9 +784,8 @@
         const tableBody = document.getElementById('scheduleTableBody');
         let tableHTML = '';
         scheduleRows.forEach(row => {
-            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(row.feedKey) ? ` (${row.quality})` : '';
             tableHTML += `<tr>
-                <td><strong>${row.stageName}</strong><br><small style="color:#718096;">${row.feedKey}${qualText}</small></td>
+                <td><strong>${row.stageName}</strong><br><small style="color:#718096;">${row.feedCode}</small></td>
                 <td>${row.startWeight} → ${row.endWeight}</td>
                 <td>${row.startDateStr} – ${row.endDateStr}<br><small style="color:#718096;">(${row.days} days)</small></td>
                 <td>${row.freq}</td>
@@ -792,8 +804,7 @@
         const costListEl = document.getElementById('costList');
         let costHTML = '';
         costResults.forEach(item => {
-            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(item.feedKey) ? ` [${item.quality}]` : '';
-            costHTML += `<li><span>${item.feedKey}${qualText} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
+            costHTML += `<li><span>${item.feedCode} (${item.bags} bag${item.bags > 1 ? 's' : ''} × ${currencyFormatter.format(item.unitPrice)}):</span> <strong>${currencyFormatter.format(item.totalCost)}</strong></li>`;
         });
         costHTML += `<li class="total-row"><span>Total Feed Value:</span> <strong>${currencyFormatter.format(totalCost)}</strong></li>`;
         costListEl.innerHTML = costHTML;
@@ -815,14 +826,12 @@
 
         let stageText = '';
         currentSummary.scheduleRows.forEach(row => {
-            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(row.feedKey) ? ` (${row.quality})` : '';
-            stageText += `- ${row.stageName} (${row.feedKey}${qualText}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
+            stageText += `- ${row.stageName} (${row.feedCode}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
         });
 
         let costBreakdownText = '';
         currentSummary.costResults.forEach(item => {
-            const qualText = ['3mm', '4.5mm', '6mm', '8mm'].includes(item.feedKey) ? ` [${item.quality}]` : '';
-            costBreakdownText += `- ${item.feedKey}${qualText}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
+            costBreakdownText += `- ${item.feedCode}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
