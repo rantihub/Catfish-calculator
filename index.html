@@ -12,6 +12,7 @@
             --card-bg: #ffffff;
             --text: #2d3748;
             --accent: #25D366;
+            --accent-dark: #1da851;
             --border: #cbd5e0;
         }
 
@@ -188,18 +189,39 @@
             color: white;
         }
 
-        .btn-whatsapp {
-            background-color: var(--accent);
-            color: white;
+        .whatsapp-actions {
             display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            flex-direction: column;
+            gap: 10px;
             margin-top: 16px;
         }
 
+        @media (min-width: 550px) {
+            .whatsapp-actions {
+                flex-direction: row;
+            }
+        }
+
+        .btn-whatsapp {
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-whatsapp-compact {
+            background-color: var(--accent-dark);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
         .summary-card {
-            display: none; 
+            display: none;
             background: #f7fafc;
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -521,7 +543,10 @@
         </div>
     </div>
 
-    <button class="btn-whatsapp" id="btnWhatsApp">Share Summary via WhatsApp</button>
+    <div class="whatsapp-actions" id="whatsappActions">
+        <button class="btn-whatsapp" id="btnWhatsAppFull">Share Complete Plan via WhatsApp</button>
+        <button class="btn-whatsapp-compact" id="btnWhatsAppSizes">Share Feed Sizes Summary Only</button>
+    </div>
 </div>
 
 <script>
@@ -580,7 +605,6 @@
         return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     }
 
-    // Returns formatted code: 3mms, 3mmes, 4.5mms, 4.5mmes, etc.
     function getFeedCode(feedKey, quality) {
         if (feedKey === '2mm') return '2ms';
         if (['3mm', '4.5mm', '6mm', '8mm'].includes(feedKey)) {
@@ -817,14 +841,18 @@
 
         const summaryCard = document.getElementById('summaryCard');
         summaryCard.style.display = 'block';
-        
-        const btnWhatsApp = document.getElementById('btnWhatsApp');
-        btnWhatsApp.style.display = 'flex';
+
+        const whatsappActions = document.getElementById('whatsappActions');
+        whatsappActions.style.display = 'flex';
 
         summaryCard.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function shareWhatsApp() {
+    function sendToWhatsApp(messageText) {
+        window.location.href = `whatsapp://send?text=${encodeURIComponent(messageText)}`;
+    }
+
+    function shareWhatsAppFull() {
         if (!currentSummary) {
             calculateSummary();
             if (!currentSummary) return;
@@ -832,15 +860,18 @@
 
         let stageText = '';
         currentSummary.scheduleRows.forEach(row => {
-            stageText += `- ${row.stageName} (${row.feedCode}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} bags)\n`;
+            const bagLabel = row.bags > 1 ? 'bags' : 'bag';
+            stageText += `- ${row.stageName} (${row.feedCode}): ${row.startDateStr} to ${row.endDateStr} | ${row.startWeight} -> ${row.endWeight} | ${row.freq} | ${row.kg}kg (${row.bags} ${bagLabel})\n`;
         });
 
         let costBreakdownText = '';
         currentSummary.costResults.forEach(item => {
-            costBreakdownText += `- ${item.feedCode}: ${item.bags} bag${item.bags > 1 ? 's' : ''} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
+            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
+            costBreakdownText += `- ${item.feedCode}: ${item.bags} ${bagLabel} @ ${currencyFormatter.format(item.unitPrice)} = ${currencyFormatter.format(item.totalCost)}\n`;
         });
 
         const targetLabel = currentSummary.targetHarvestG >= 1000 ? `${(currentSummary.targetHarvestG / 1000).toFixed(1)} KG` : `${currentSummary.targetHarvestG}g`;
+        const totalBagsLabel = currentSummary.totalBagsCount > 1 ? 'bags' : 'bag';
 
         const text = `*Skretting Catfish Production Plan*
 ---------------------------
@@ -851,7 +882,7 @@
 - Population: ${currentSummary.numFish.toLocaleString()} fish
 - Target Weight: ${targetLabel}
 - Est. Duration: ~${currentSummary.totalEstDays} Days
-- Total Feed: ${currentSummary.totalFeedKg} KG (${currentSummary.totalBagsCount} bags)
+- Total Feed: ${currentSummary.totalFeedKg} KG (${currentSummary.totalBagsCount} ${totalBagsLabel})
 ---------------------------
 PRESCRIBED FEEDING & PROGRESSION:
 ${stageText}---------------------------
@@ -859,13 +890,37 @@ COST BREAKDOWN:
 ${costBreakdownText}---------------------------
 *TOTAL FEED VALUE: ${currencyFormatter.format(currentSummary.totalCost)}*`;
 
-        window.location.href = `whatsapp://send?text=${encodeURIComponent(text)}`;
+        sendToWhatsApp(text);
+    }
+
+    function shareWhatsAppSizesOnly() {
+        if (!currentSummary) {
+            calculateSummary();
+            if (!currentSummary) return;
+        }
+
+        let sizesText = '';
+        currentSummary.costResults.forEach(item => {
+            const bagLabel = item.bags > 1 ? 'bags' : 'bag';
+            sizesText += `- ${item.feedCode}: ${item.bags} (${bagLabel})\n`;
+        });
+
+        const totalBagsLabel = currentSummary.totalBagsCount > 1 ? 'bags' : 'bag';
+
+        const text = `*Skretting Feed Sizes Summary*
+---------------------------
+${sizesText}---------------------------
+*Total Bags: ${currentSummary.totalBagsCount} (${totalBagsLabel})*
+*Total Feed Value: ${currencyFormatter.format(currentSummary.totalCost)}*`;
+
+        sendToWhatsApp(text);
     }
 
     updatePondDimensions();
 
     document.getElementById('btnGenerate').addEventListener('click', calculateSummary);
-    document.getElementById('btnWhatsApp').addEventListener('click', shareWhatsApp);
+    document.getElementById('btnWhatsAppFull').addEventListener('click', shareWhatsAppFull);
+    document.getElementById('btnWhatsAppSizes').addEventListener('click', shareWhatsAppSizesOnly);
 </script>
 
 </body>
